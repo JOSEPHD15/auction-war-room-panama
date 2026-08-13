@@ -1,0 +1,2142 @@
+﻿[
+    {
+        "nombre":  "Josh Allen",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Bijan Robinson",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ja\u0027Marr Chase",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Brock Bowers",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Brandon Aubrey",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Houston Texans",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Lamar Jackson",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jahmyr Gibbs",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Puka Nacua",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Trey McBride",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ka\u0027imi Fairbairn",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Denver Broncos",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Drake Maye",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jonathan Taylor",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jaxon Smith-Njigba",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Colston Loveland",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Cameron Dicker",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Los Angeles Rams",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Joe Burrow",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "James Cook III",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Amon-Ra St. Brown",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tyler Warren",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Cam Little",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Seattle Seahawks",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jayden Daniels",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Christian McCaffrey",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Justin Jefferson",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tucker Kraft",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jason Myers",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Philadelphia Eagles",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jalen Hurts",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Chase Brown",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "A.J. Brown",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Harold Fannin Jr.",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Eddy Pineiro",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Minnesota Vikings",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Dak Prescott",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "De\u0027Von Achane",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "CeeDee Lamb",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kyle Pitts Sr.",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tyler Loop",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Pittsburgh Steelers",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Caleb Williams",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ashton Jeanty",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Drake London",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Sam LaPorta",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Evan McPherson",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Los Angeles Chargers",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Trevor Lawrence",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Omarion Hampton",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "George Pickens",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Travis Kelce",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Cairo Santos",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "New England Patriots",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jaxson Dart",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Derrick Henry",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Nico Collins",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "George Kittle",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jake Bates",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jacksonville Jaguars",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Justin Herbert",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Saquon Barkley",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Rashee Rice",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jake Ferguson",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Andy Borregales",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Baltimore Ravens",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Patrick Mahomes II",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kenneth Walker III",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Chris Olave",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Dalton Kincaid",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Harrison Mevis",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Detroit Lions",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Brock Purdy",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jeremiyah Love",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "DeVonta Smith",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Dallas Goedert",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Chris Boswell",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Green Bay Packers",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Bo Nix",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kyren Williams",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tetairoa McMillan",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Isaiah Likely",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Chase McLaughlin",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Cleveland Browns",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Matthew Stafford",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Josh Jacobs",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Zay Flowers",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Chig Okonkwo",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Harrison Butker",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Buffalo Bills",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kyler Murray",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Javonte Williams",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tee Higgins",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Mark Andrews",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Will Reichard",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Chicago Bears",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jared Goff",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Breece Hall",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Malik Nabers",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Brenton Strange",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Wil Lutz",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kansas City Chiefs",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Baker Mayfield",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Cam Skattebo",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Emeka Egbuka",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Juwan Johnson",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Charlie Smyth",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Atlanta Falcons",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Malik Willis",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Travis Etienne Jr.",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jaylen Waddle",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Hunter Henry",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jake Elliott",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "New Orleans Saints",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tyler Shough",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Quinshon Judkins",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Garrett Wilson",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "T.J. Hockenson",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Blake Grupe",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Indianapolis Colts",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jordan Love",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "D\u0027Andre Swift",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Terry McLaurin",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Dalton Schultz",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tyler Bass",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "New York Giants",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Sam Darnold",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "David Montgomery",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Mike Evans",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Oronde Gadsden II",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Chad Ryland",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "San Francisco 49ers",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "C.J. Stroud",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Bucky Irving",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ladd McConkey",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "AJ Barner",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Nick Folk",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tampa Bay Buccaneers",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Daniel Jones",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Bhayshul Tuten",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "DJ Moore",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Gunnar Helm",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Joey Slye",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Miami Dolphins",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Cam Ward",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jadarian Price",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Davante Adams",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Pat Freiermuth",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ryan Fitzgerald",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Cincinnati Bengals",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Bryce Young",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "TreVeyon Henderson",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jameson Williams",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kenyon Sadiq",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Zane Gonzalez",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Dallas Cowboys",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jacoby Brissett",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Rhamondre Stevenson",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Luther Burden III",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Greg Dulcich",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Trey Smack",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Carolina Panthers",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Aaron Rodgers",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tony Pollard",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Christian Watson",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "David Njoku",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Daniel Carlson",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tennessee Titans",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tua Tagovailoa",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jaylen Warren",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Carnell Tate",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Cade Otton",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ben Sauls",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Washington Commanders",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Geno Smith",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Chuba Hubbard",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Rome Odunze",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Terrance Ferguson",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jake Moody",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Las Vegas Raiders",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Fernando Mendoza",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Rico Dowdle",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Marvin Harrison Jr.",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Evan Engram",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Brandon McManus",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "New York Jets",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Shedeur Sanders",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "J.K. Dobbins",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Alec Pierce",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Oscar Delp",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Spencer Shrader",
+        "posicion":  "K",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Arizona Cardinals",
+        "posicion":  "DEF",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kirk Cousins",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kyle Monangai",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Parker Washington",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Colby Parkinson",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Deshaun Watson",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "RJ Harvey",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jordyn Tyson",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Mason Taylor",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Michael Penix Jr.",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kenny Gainwell",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "DK Metcalf",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Mike Gesicki",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Carson Beck",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Rachaad White",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Brian Thomas Jr.",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jake Tonges",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "J.J. McCarthy",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Blake Corum",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Michael Wilson",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Eli Stowers",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Mac Jones",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jordan Mason",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Courtland Sutton",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Darnell Washington",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Justin Fields",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jonathon Brooks",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Michael Pittman Jr.",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ja\u0027Tavion Sanders",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Anthony Richardson Sr.",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jacory Croskey-Merritt",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Chris Godwin Jr.",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Theo Johnson",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ty Simpson",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Aaron Jones Sr.",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Quentin Johnston",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Elijah Arroyo",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tyler Huntley",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tyrone Tracy Jr.",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Makai Lemon",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Max Klare",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Marcus Mariota",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Alvin Kamara",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jayden Reed",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Dawson Knox",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Joe Flacco",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Chris Rodriguez Jr.",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jordan Addison",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Cole Kmet",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jameis Winston",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tyler Allgeier",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Josh Downs",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Michael Mayer",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Joe Milton III",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Woody Marks",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jakobi Meyers",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tyler Higbee",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Quinn Ewers",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Keaton Mitchell",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Wan\u0027Dale Robinson",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Eli Raridon",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Gardner Minshew II",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Brian Robinson Jr.",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jayden Higgins",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Noah Gray",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Cade Klubnik",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Isiah Pacheco",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Stefon Diggs",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Erick All Jr.",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Riley Leonard",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Dylan Sampson",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Khalil Shakir",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tommy Tremble",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Trey Lance",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tyjae Spears",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "KC Concepcion",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Will Kacmarek",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Davis Mills",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Braelon Allen",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Rashid Shaheed",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Luke Musgrave",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Spencer Rattler",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jonah Coleman",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Romeo Doubs",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Justin Joly",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jalen Milroe",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Emanuel Wilson",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jalen Coker",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Noah Fant",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kyle Allen",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tank Bigsby",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Deebo Samuel Sr.",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ben Sinnott",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jarrett Stidham",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Nicholas Singleton",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jerry Jeudy",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Mitchell Evans",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Teddy Bridgewater",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Zach Charbonnet",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Xavier Worthy",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Daniel Bellinger",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Taylen Green",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Mike Washington Jr.",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Matthew Golden",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Austin Hooper",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jake Browning",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kaytron Allen",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jalen McMillan",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Charlie Kolar",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tommy DeVito",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Justice Hill",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Denzel Boston",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Adam Trautman",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Drew Allar",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kimani Vidal",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jalen Nailor",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Zach Ertz",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Will Howard",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "MarShawn Lloyd",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Adonai Mitchell",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jonnu Smith",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Mason Rudolph",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ray Davis",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Omar Cooper Jr.",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Darren Waller",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Will Levis",
+        "posicion":  "QB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ollie Gordon II",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Travis Hunter",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Elijah Higgins",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Sean Tucker",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tre Tucker",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "John Bates",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jaydon Blue",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jauan Jennings",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tommy Myers",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jaylen Wright",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kayshon Boutte",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Mo Alie-Cox",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Emmett Johnson",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Rashod Bateman",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Josh Oliver",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "George Holani",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Malik Washington",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Marlin Klein",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ty Johnson",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ryan Flournoy",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tanner Koziol",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "James Conner",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Calvin Ridley",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Nate Boerkircher",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Demond Claiborne",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Isaac TeSlaa",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Drew Sample",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Chris Brooks",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jack Bech",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Luke Schoonmaker",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Samaje Perine",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tory Horton",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jackson Hawes",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Emari Demercado",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Antonio Williams",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Brock Wright",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kaelon Black",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Pat Bryant",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Durham Smythe",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "DJ Giddens",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Chris Bell",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tanner Hudson",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Isaiah Davis",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tre\u0027 Harris",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Taysom Hill",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "LeQuint Allen Jr.",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tyquan Thornton",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Albert Okwuegbunam Jr.",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Malik Davis",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Zachariah Branch",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jack Endries",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Trey Benson",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Darnell Mooney",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jeremy Ruckert",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jordan James",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "De\u0027Zhaun Stribling",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Seydou Traore",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kendre Miller",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tank Dell",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tyler Conklin",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kaleb Johnson",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Germie Bernard",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Moliki Matavao",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Seth McGowan",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Dontayvion Wicks",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Matt Hibner",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Devin Neal",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jaylin Noel",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Nate Adkins",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Devin Singletary",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Cooper Kupp",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Will Mallory",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Adam Randall",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Troy Franklin",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Miles Kitselman",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Brashard Smith",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Elic Ayomanor",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Foster Moreau",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jerome Ford",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Keon Coleman",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Will Dissly",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Will Shipley",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Chimere Dike",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jordan Akins",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Tahj Brooks",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Darius Slayton",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ian Thomas",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Trevor Etienne",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Malachi Fields",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Khalil Dinkins",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jaleel McLaughlin",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Christian Kirk",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Michael Trigg",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Najee Harris",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Elijah Sarratt",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Sam Roush",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Isaac Guerendo",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Ted Hurst III",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Thomas Fidone II",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jarquez Hunter",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Devaughn Vele",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Bauer Sharp",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Audric Estime",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Xavier Legette",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Joe Royer",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Kareem Hunt",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Marvin Mims Jr.",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Cade Stover",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Joe Mixon",
+        "posicion":  "RB",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Hollywood Brown",
+        "posicion":  "WR",
+        "equipoNFL":  ""
+    },
+    {
+        "nombre":  "Jared Wiley",
+        "posicion":  "TE",
+        "equipoNFL":  ""
+    }
+]
