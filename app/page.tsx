@@ -19,8 +19,9 @@ type Pick = { jugador: string; posicion: string; precio: string; objetivo: strin
 type ScenarioKey = "A" | "B" | "C";
 type Screen = "board" | "team" | "prices" | "rankings" | "scouting";
 type ScoutingAction = "GANGA TOP" | "COMPRA" | "PAGA" | "DARDO" | "NOMINAR YA" | "EVITAR";
+type LastPick = { team: string; slot: string; jugador: string; precio: string; posicion: string; updatedAt: number };
 
-const TEAMS = [
+const DEFAULT_TEAMS = [
   "Dirupeps", "HITORI KAKURENBO", "Chocolate Coco", "Bali Maxx", "HyP",
   "Sum2Prove", "SHAKED", "Deluxe", "la lavanderia", "Los culecos",
 ];
@@ -65,7 +66,7 @@ const INITIAL_PLAYERS: Player[] = [
 ];
 
 const emptyPick = (): Pick => ({ jugador: "", posicion: "", precio: "", objetivo: "" });
-const makeBoard = () => Object.fromEntries(TEAMS.map((team) => [team, SLOTS.map(emptyPick)])) as Record<string, Pick[]>;
+const makeBoard = (teams = DEFAULT_TEAMS) => Object.fromEntries(teams.map((team) => [team, SLOTS.map(emptyPick)])) as Record<string, Pick[]>;
 const makeScenarios = () => ({ A: SLOTS.map(emptyPick), B: SLOTS.map(emptyPick), C: SLOTS.map(emptyPick) });
 
 function allowedPositions(slot: string): Position[] {
@@ -97,9 +98,12 @@ function PlayerInput({ value, onChange, options, id, placeholder = "Jugador" }: 
 export default function Home() {
   const [screen, setScreen] = useState<Screen>("board");
   const [dark, setDark] = useState(true);
+  const [teams, setTeams] = useState<string[]>(DEFAULT_TEAMS);
   const [players, setPlayers] = useState<Player[]>(INITIAL_PLAYERS);
   const [board, setBoard] = useState<Record<string, Pick[]>>(makeBoard);
   const [scenarios, setScenarios] = useState<Record<ScenarioKey, Pick[]>>(makeScenarios);
+  const [lastPick, setLastPick] = useState<LastPick | null>(null);
+  const [configOpen, setConfigOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [query, setQuery] = useState("");
   const [positionFilter, setPositionFilter] = useState<string>("TODAS");
@@ -113,8 +117,10 @@ export default function Home() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed.board) setBoard(parsed.board);
+        if (Array.isArray(parsed.teams) && parsed.teams.length) setTeams(parsed.teams);
         if (parsed.scenarios) setScenarios(parsed.scenarios);
         if (parsed.players) setPlayers(parsed.players);
+        if (parsed.lastPick) setLastPick(parsed.lastPick);
         if (typeof parsed.dark === "boolean") setDark(parsed.dark);
       }
     } catch { setToast("No se pudo restaurar el guardado anterior."); }
@@ -122,8 +128,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (hydrated) localStorage.setItem(STORAGE_KEY, JSON.stringify({ board, scenarios, players, dark }));
-  }, [board, scenarios, players, dark, hydrated]);
+    if (hydrated) localStorage.setItem(STORAGE_KEY, JSON.stringify({ board, teams, scenarios, players, lastPick, dark }));
+  }, [board, teams, scenarios, players, lastPick, dark, hydrated]);
 
   useEffect(() => {
     if (!toast) return;
@@ -138,12 +144,21 @@ export default function Home() {
   }), [players, query, positionFilter]);
 
   const updateBoardPick = (team: string, slotIndex: number, patch: Partial<Pick>) => {
-    setBoard((current) => ({ ...current, [team]: current[team].map((pick, index) => {
+    setBoard((current) => ({ ...current, [team]: (current[team] || SLOTS.map(emptyPick)).map((pick, index) => {
       if (index !== slotIndex) return pick;
       const next = { ...pick, ...patch };
       if (patch.jugador !== undefined) next.posicion = playerMap.get(patch.jugador.toLowerCase())?.posicion || pick.posicion;
+      if (next.jugador.trim() && next.precio !== "") setLastPick({ team, slot: SLOTS[slotIndex], jugador: next.jugador, precio: next.precio, posicion: next.posicion, updatedAt: Date.now() });
       return next;
     }) }));
+  };
+
+  const applyTeams = (nextTeams: string[]) => {
+    const cleaned = nextTeams.map((team, index) => team.trim() || `Equipo ${index + 1}`);
+    if (new Set(cleaned.map((team) => team.toLowerCase())).size !== cleaned.length) { setToast("Cada equipo debe tener un nombre diferente."); return; }
+    setBoard((current) => Object.fromEntries(cleaned.map((team, index) => [team, current[teams[index]] || SLOTS.map(emptyPick)])) as Record<string, Pick[]>);
+    setLastPick((current) => current ? { ...current, team: cleaned[teams.indexOf(current.team)] || current.team } : current);
+    setTeams(cleaned); setConfigOpen(false); setToast("Equipos actualizados.");
   };
 
   const updateScenarioPick = (scenario: ScenarioKey, slotIndex: number, patch: Partial<Pick>) => {
@@ -165,7 +180,7 @@ export default function Home() {
   };
 
   const exportJSON = () => {
-    const blob = new Blob([JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), board, scenarios, players, dark }, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify({ version: 2, exportedAt: new Date().toISOString(), board, teams, scenarios, players, lastPick, dark }, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url; anchor.download = "auction-war-room.json"; anchor.click(); URL.revokeObjectURL(url);
@@ -177,14 +192,14 @@ export default function Home() {
     try {
       const data = JSON.parse(await file.text());
       if (!data.board || !data.scenarios || !Array.isArray(data.players)) throw new Error("Formato inválido");
-      setBoard(data.board); setScenarios(data.scenarios); setPlayers(data.players); if (typeof data.dark === "boolean") setDark(data.dark);
+      setBoard(data.board); if (Array.isArray(data.teams) && data.teams.length) setTeams(data.teams); setScenarios(data.scenarios); setPlayers(data.players); setLastPick(data.lastPick || null); if (typeof data.dark === "boolean") setDark(data.dark);
       setToast("Datos importados correctamente.");
     } catch { setToast("Ese archivo no es una exportación válida."); }
     event.target.value = "";
   };
 
-  const resetBoard = () => { if (confirm("¿Vaciar todo el Draft Board?")) { setBoard(makeBoard()); setToast("Draft Board reiniciado."); } };
-  const resetAll = () => { if (confirm("¿Borrar board, escenarios y precios personalizados?")) { setBoard(makeBoard()); setScenarios(makeScenarios()); setPlayers(INITIAL_PLAYERS); setToast("Todo ha sido reiniciado."); } };
+  const resetBoard = () => { if (confirm("¿Vaciar todo el Draft Board?")) { setBoard(makeBoard(teams)); setLastPick(null); setToast("Draft Board reiniciado."); } };
+  const resetAll = () => { if (confirm("¿Borrar board, equipos, escenarios y precios personalizados?")) { setTeams(DEFAULT_TEAMS); setBoard(makeBoard(DEFAULT_TEAMS)); setLastPick(null); setScenarios(makeScenarios()); setPlayers(INITIAL_PLAYERS); setToast("Todo ha sido reiniciado."); } };
 
   const navItems: { id: Screen; label: string; short: string }[] = [
     { id: "board", label: "Draft Board", short: "Board" }, { id: "team", label: "Mi Equipo", short: "Equipo" },
@@ -200,6 +215,7 @@ export default function Home() {
       <nav className="nav-tabs" aria-label="Pantallas principales">
         {navItems.map((item) => <button key={item.id} className={screen === item.id ? "active" : ""} onClick={() => setScreen(item.id)}><span className="nav-full">{item.label}</span><span className="nav-short">{item.short}</span></button>)}
       </nav>
+      <div className="sponsor-lockup"><span>SPONSORED BY</span><img src="/bali-maxx.png" alt="Bali Maxx" /></div>
       <div className="header-actions">
         <button className="icon-button" onClick={() => setDark((value) => !value)} title="Cambiar tema" aria-label="Cambiar tema">{dark ? "☀" : "◐"}</button>
         <button className="ghost-button" onClick={exportJSON}>Exportar</button>
@@ -208,13 +224,13 @@ export default function Home() {
       </div>
     </header>
 
-    {screen === "board" && <BoardScreen players={players} board={board} updatePick={updateBoardPick} resetBoard={resetBoard} />}
+    {screen === "board" && <BoardScreen players={players} teams={teams} board={board} lastPick={lastPick} updatePick={updateBoardPick} resetBoard={resetBoard} configOpen={configOpen} setConfigOpen={setConfigOpen} applyTeams={applyTeams} />}
     {screen === "team" && <TeamScreen players={players} scenarios={scenarios} updatePick={updateScenarioPick} resetScenario={(key) => { if (confirm(`¿Reiniciar escenario ${key}?`)) setScenarios((current) => ({ ...current, [key]: SLOTS.map(emptyPick) })); }} />}
     {screen === "prices" && <PricesScreen players={filteredPlayers} query={query} setQuery={setQuery} position={positionFilter} setPosition={setPositionFilter} updateTarget={updateTarget} />}
     {screen === "rankings" && <RankingsScreen players={filteredPlayers} query={query} setQuery={setQuery} position={positionFilter} setPosition={setPositionFilter} />}
     {screen === "scouting" && <ScoutingScreen players={players} query={query} setQuery={setQuery} position={positionFilter} setPosition={setPositionFilter} action={actionFilter} setAction={setActionFilter} />}
 
-    <footer><span>Guardado automático en este dispositivo</span><span>10 equipos · $200 · 14 slots</span><button onClick={resetAll}>Reiniciar todo</button></footer>
+    <footer><span>Guardado automático en este dispositivo</span><span>{teams.length} equipos · $200 · 14 slots</span><span className="footer-sponsor">Sponsored by Bali Maxx</span><button onClick={resetAll}>Reiniciar todo</button></footer>
     {toast && <div className="toast" role="status">{toast}</div>}
   </main>;
 }
@@ -223,31 +239,46 @@ function PageIntro({ eyebrow, title, text, actions }: { eyebrow: string; title: 
   return <div className="page-intro"><div><span className="eyebrow">{eyebrow}</span><h1>{title}</h1><p>{text}</p></div>{actions && <div className="intro-actions">{actions}</div>}</div>;
 }
 
-function BoardScreen({ players, board, updatePick, resetBoard }: { players: Player[]; board: Record<string, Pick[]>; updatePick: (team: string, index: number, patch: Partial<Pick>) => void; resetBoard: () => void }) {
+function BoardScreen({ players, teams, board, lastPick, updatePick, resetBoard, configOpen, setConfigOpen, applyTeams }: { players: Player[]; teams: string[]; board: Record<string, Pick[]>; lastPick: LastPick | null; updatePick: (team: string, index: number, patch: Partial<Pick>) => void; resetBoard: () => void; configOpen: boolean; setConfigOpen: (value: boolean) => void; applyTeams: (teams: string[]) => void }) {
   return <section className="page-shell">
-    <PageIntro eyebrow="Sala de subasta" title="Draft Board" text="Carga cada compra. El poder de puja rival se recalcula al instante." actions={<button className="danger-button" onClick={resetBoard}>Vaciar board</button>} />
+    <PageIntro eyebrow="Sala de subasta" title="Draft Board" text="Carga cada compra. El poder de puja rival se recalcula al instante." actions={<><button className="ghost-button" onClick={() => setConfigOpen(!configOpen)}>⚙ Editar liga</button><button className="danger-button" onClick={resetBoard}>Vaciar board</button></>} />
+    {configOpen && <LeagueSettings teams={teams} onSave={applyTeams} onCancel={() => setConfigOpen(false)} />}
+    <article className={`last-pick-hero ${lastPick ? "has-pick" : ""}`}>
+      <div className="last-pick-label"><i /> ÚLTIMA COMPRA</div>
+      <div className="last-pick-main">
+        <div><span>{lastPick?.posicion || "EN ESPERA"}</span><h2>{lastPick?.jugador || "Esperando la primera compra"}</h2><p>{lastPick ? `${lastPick.team} · ${lastPick.slot}` : "Al completar un jugador y su precio aparecerá aquí automáticamente."}</p></div>
+        <strong>{lastPick ? money(Number(lastPick.precio)) : "$—"}</strong>
+      </div>
+      <div className="last-pick-sponsor"><span>POWERED BY</span><img src="/bali-maxx.png" alt="Bali Maxx" /></div>
+    </article>
     <div className="legend"><span><i className="dot dot-green" /> Poder de compra &gt; $40</span><span><i className="dot dot-red" /> Topado &lt; $6</span><span><i className="dot dot-gold" /> Edición en vivo</span></div>
     <div className="table-wrap board-wrap">
       <table className="draft-table">
-        <thead><tr><th className="sticky-col slot-head">SLOT</th>{TEAMS.map((team) => { const stats = statsFor(board[team]); return <th key={team}><span>{team}</span><small>{money(stats.remaining)} libres</small></th>; })}</tr></thead>
-        <tbody>{SLOTS.map((slot, slotIndex) => <tr key={slot}><th className="sticky-col"><span className={`slot-badge slot-${slot.replace(/\s|\d/g, "").toLowerCase()}`}>{slot}</span></th>{TEAMS.map((team, teamIndex) => {
-          const pick = board[team][slotIndex]; const options = players.filter((player) => allowedPositions(slot).includes(player.posicion));
+        <thead><tr><th className="sticky-col slot-head">SLOT</th>{teams.map((team) => { const stats = statsFor(board[team] || SLOTS.map(emptyPick)); return <th key={team}><span>{team}</span><small>{money(stats.remaining)} libres</small></th>; })}</tr></thead>
+        <tbody>{SLOTS.map((slot, slotIndex) => <tr key={slot}><th className="sticky-col"><span className={`slot-badge slot-${slot.replace(/\s|\d/g, "").toLowerCase()}`}>{slot}</span></th>{teams.map((team, teamIndex) => {
+          const pick = (board[team] || SLOTS.map(emptyPick))[slotIndex]; const options = players.filter((player) => allowedPositions(slot).includes(player.posicion));
           return <td key={team}><div className="pick-cell"><PlayerInput value={pick.jugador} onChange={(jugador) => updatePick(team, slotIndex, { jugador })} options={options} id={`board-${slotIndex}-${teamIndex}`} /><div className="price-row"><span>$</span><input aria-label={`Precio de ${team}, ${slot}`} className="price-field" type="number" min="0" max="200" value={pick.precio} onChange={(event) => updatePick(team, slotIndex, { precio: event.target.value })} placeholder="0" />{pick.posicion && <em>{pick.posicion}</em>}</div></div></td>;
         })}</tr>)}</tbody>
       </table>
     </div>
 
     <div className="section-heading"><div><span className="eyebrow">Control financiero</span><h2>Poder de compra por equipo</h2></div><p>Máxima puja reserva $1 por cada slot pendiente.</p></div>
-    <div className="team-grid">{TEAMS.map((team) => { const stats = statsFor(board[team]); const tone = stats.maxBid > 40 ? "green" : stats.maxBid < 6 ? "red" : "blue"; return <article className="team-card" key={team}><div className="team-card-head"><h3>{team}</h3><span>{stats.filled}/{SLOTS.length}</span></div><div className="money-pair"><Metric label="RESTANTE" value={money(stats.remaining)} strong /><Metric label="MÁXIMA PUJA" value={money(stats.maxBid)} strong tone={tone} /></div><div className="stat-line"><span>Gastado <b>{money(stats.spent)}</b></span><span>Vacíos <b>{stats.empty}</b></span><span>Promedio <b>${stats.average.toFixed(1)}</b></span></div></article>; })}</div>
+    <div className="team-grid">{teams.map((team) => { const stats = statsFor(board[team] || SLOTS.map(emptyPick)); const tone = stats.maxBid > 40 ? "green" : stats.maxBid < 6 ? "red" : "blue"; return <article className="team-card" key={team}><div className="team-card-head"><h3>{team}</h3><span>{stats.filled}/{SLOTS.length}</span></div><div className="money-pair"><Metric label="RESTANTE" value={money(stats.remaining)} strong /><Metric label="MÁXIMA PUJA" value={money(stats.maxBid)} strong tone={tone} /></div><div className="stat-line"><span>Gastado <b>{money(stats.spent)}</b></span><span>Vacíos <b>{stats.empty}</b></span><span>Promedio <b>${stats.average.toFixed(1)}</b></span></div></article>; })}</div>
 
-    <NeedsTable board={board} players={players} />
+    <NeedsTable teams={teams} board={board} players={players} />
   </section>;
 }
 
-function NeedsTable({ board, players }: { board: Record<string, Pick[]>; players: Player[] }) {
+function LeagueSettings({ teams, onSave, onCancel }: { teams: string[]; onSave: (teams: string[]) => void; onCancel: () => void }) {
+  const [draft, setDraft] = useState(teams);
+  const changeCount = (count: number) => setDraft((current) => Array.from({ length: Math.min(16, Math.max(2, count)) }, (_, index) => current[index] || `Equipo ${index + 1}`));
+  return <div className="league-settings"><div className="settings-head"><div><span className="eyebrow">Configuración de liga</span><h2>Equipos y nombres</h2></div><label>CANTIDAD<input aria-label="Cantidad de equipos" type="number" min="2" max="16" value={draft.length} onChange={(event) => changeCount(Number(event.target.value))} /></label></div><div className="team-name-grid">{draft.map((team, index) => <label key={index}><span>{index + 1}</span><input aria-label={`Nombre del equipo ${index + 1}`} value={team} onChange={(event) => setDraft((current) => current.map((name, itemIndex) => itemIndex === index ? event.target.value : name))} /></label>)}</div><div className="settings-actions"><button className="ghost-button" onClick={onCancel}>Cancelar</button><button className="save-button" onClick={() => onSave(draft)}>Guardar equipos</button></div></div>;
+}
+
+function NeedsTable({ teams, board, players }: { teams: string[]; board: Record<string, Pick[]>; players: Player[] }) {
   const targets: Record<Position, number> = { QB: 1, RB: 2, WR: 2, TE: 1, K: 1, DEF: 1 };
   const map = new Map(players.map((player) => [player.nombre.toLowerCase(), player.posicion]));
-  return <div className="needs-section"><div className="section-heading"><div><span className="eyebrow">Radar competitivo</span><h2>Qué le falta a cada equipo</h2></div><p>Identifica quién puede pujar por la próxima nominación.</p></div><div className="table-wrap"><table className="needs-table"><thead><tr><th>Equipo</th>{POSITIONS.map((position) => <th key={position}>{position}</th>)}</tr></thead><tbody>{TEAMS.map((team) => { const counts = POSITIONS.reduce((all, position) => ({ ...all, [position]: 0 }), {} as Record<Position, number>); board[team].forEach((pick) => { const position = map.get(pick.jugador.toLowerCase()); if (position) counts[position] += 1; }); return <tr key={team}><th>{team}</th>{POSITIONS.map((position) => { const missing = Math.max(0, targets[position] - counts[position]); return <td key={position}>{missing === 0 ? <span className="complete">✓</span> : <span className="missing">{missing}</span>}</td>; })}</tr>; })}</tbody></table></div></div>;
+  return <div className="needs-section"><div className="section-heading"><div><span className="eyebrow">Radar competitivo</span><h2>Qué le falta a cada equipo</h2></div><p>Identifica quién puede pujar por la próxima nominación.</p></div><div className="table-wrap"><table className="needs-table"><thead><tr><th>Equipo</th>{POSITIONS.map((position) => <th key={position}>{position}</th>)}</tr></thead><tbody>{teams.map((team) => { const counts = POSITIONS.reduce((all, position) => ({ ...all, [position]: 0 }), {} as Record<Position, number>); (board[team] || []).forEach((pick) => { const position = map.get(pick.jugador.toLowerCase()); if (position) counts[position] += 1; }); return <tr key={team}><th>{team}</th>{POSITIONS.map((position) => { const missing = Math.max(0, targets[position] - counts[position]); return <td key={position}>{missing === 0 ? <span className="complete">✓</span> : <span className="missing">{missing}</span>}</td>; })}</tr>; })}</tbody></table></div></div>;
 }
 
 function TeamScreen({ players, scenarios, updatePick, resetScenario }: { players: Player[]; scenarios: Record<ScenarioKey, Pick[]>; updatePick: (scenario: ScenarioKey, index: number, patch: Partial<Pick>) => void; resetScenario: (scenario: ScenarioKey) => void }) {
