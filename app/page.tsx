@@ -79,7 +79,7 @@ export default function Home() {
 
   return <main className={dark ? "app theme-dark" : "app theme-light"}>
     <header className="topbar public-topbar">
-      <button className="brand" aria-label="Auction War Room"><span className="brand-mark">AW</span><span><b>AUCTION</b><small>WAR ROOM · 0.5 PPR</small></span></button>
+      <button className="brand" aria-label="Auction War Room"><span className="brand-mark brand-mark-image"><img src="/draftlab-logo.jpeg" alt="Draft Lab" /></span><span><b>AUCTION</b><small>WAR ROOM · 0.5 PPR</small></span></button>
       <div className="public-title">DRAFT BOARD <span>EN VIVO</span></div>
       <div className="header-actions"><button className="icon-button" onClick={() => setDark((value) => !value)} aria-label="Cambiar tema">{dark ? "☀" : "◐"}</button><button className="ghost-button" onClick={exportJSON}>Exportar</button><button className="ghost-button" onClick={() => importRef.current?.click()}>Importar</button><input ref={importRef} className="sr-only" type="file" accept="application/json" onChange={importJSON} /></div>
     </header>

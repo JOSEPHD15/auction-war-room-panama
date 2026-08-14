@@ -15,6 +15,8 @@ button { cursor: pointer; }
 .public-title span { margin-left:8px; padding:4px 7px; border-radius:4px; background:color-mix(in srgb,var(--green) 14%,transparent); color:var(--green); font-size:8px; }
 .brand { display: flex; align-items: center; gap: 11px; color: inherit; background: none; border: 0; padding: 0; text-align: left; min-width: 174px; }
 .brand-mark { width: 40px; height: 40px; border: 1px solid #cfa344; display: grid; place-items: center; color: var(--accent); font-weight: 900; letter-spacing: -1px; transform: skew(-5deg); box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent); }
+.brand-mark-image { border: 0; transform: none; box-shadow: none; border-radius: 50%; overflow: hidden; background: #000; }
+.brand-mark-image img { width: 100%; height: 100%; object-fit: cover; }
 .brand b { display: block; font-size: 14px; letter-spacing: .14em; }
 .brand small { display: block; color: var(--muted); font-size: 8px; letter-spacing: .09em; margin-top: 2px; }
 .nav-tabs { display: flex; align-self: stretch; flex: 1; justify-content: center; }
