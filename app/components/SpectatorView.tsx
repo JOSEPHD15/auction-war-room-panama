@@ -11,7 +11,11 @@ type Phase = "loading" | "needs-pin" | "invalid-pin" | "not-found" | "ready" | "
 type ConnectionState = "live" | "reconnecting" | "offline";
 
 const CONNECTION_LABEL: Record<ConnectionState, string> = { live: "🟢 LIVE", reconnecting: "🟡 RECONNECTING", offline: "🔴 OFFLINE" };
-const POLL_INTERVAL_MS = 6000;
+// Polling stand-in for real push (Fase 5 kept this on the free tier — see chat notes on Durable Objects).
+// Fast while the tab is actually being watched, slow while backgrounded, backing off further on failures.
+const POLL_VISIBLE_MS = 2500;
+const POLL_HIDDEN_MS = 20_000;
+const MAX_POLL_BACKOFF_MS = 15_000;
 
 export default function SpectatorView({ spectatorId }: { spectatorId: string }) {
   const [phase, setPhase] = useState<Phase>("loading");
@@ -35,19 +39,37 @@ export default function SpectatorView({ spectatorId }: { spectatorId: string }) 
 
   useEffect(() => { load(); }, [spectatorId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Simple polling stand-in for real realtime (Fase 5) — enough to keep a spectator link reasonably fresh today.
   useEffect(() => {
     if (phase !== "ready") return;
-    const interval = setInterval(async () => {
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout>;
+
+    const tick = async () => {
       const result = await fetchSpectatorSnapshot(spectatorId, activePinRef.current);
-      if (result.status === "ok") { setLeague(result.league); setConnection("live"); failureCountRef.current = 0; }
-      else if (result.status === "not-found") { setPhase("not-found"); }
-      else {
+      if (cancelled) return;
+      let delay = document.visibilityState === "visible" ? POLL_VISIBLE_MS : POLL_HIDDEN_MS;
+      if (result.status === "ok") {
+        setLeague(result.league);
+        setConnection("live");
+        failureCountRef.current = 0;
+      } else if (result.status === "not-found") {
+        setPhase("not-found");
+        return;
+      } else {
         failureCountRef.current += 1;
         setConnection(failureCountRef.current >= 2 ? "offline" : "reconnecting");
+        delay = Math.min(MAX_POLL_BACKOFF_MS, delay * 2 ** (failureCountRef.current - 1));
       }
-    }, POLL_INTERVAL_MS);
-    return () => clearInterval(interval);
+      timer = setTimeout(tick, delay);
+    };
+
+    // Catch up immediately the moment the spectator comes back to the tab, instead of waiting for the
+    // in-flight background-interval timer to elapse.
+    const onVisibilityChange = () => { if (document.visibilityState === "visible") { clearTimeout(timer); tick(); } };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    timer = setTimeout(tick, POLL_VISIBLE_MS);
+    return () => { cancelled = true; clearTimeout(timer); document.removeEventListener("visibilitychange", onVisibilityChange); };
   }, [phase, spectatorId]);
 
   const submitPin = async (event: FormEvent) => {

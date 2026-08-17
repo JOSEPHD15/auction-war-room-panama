@@ -3,7 +3,7 @@ import { getDb } from "../../../db";
 import { spectatorSnapshots } from "../../../db/schema";
 import { hashPin } from "../../lib/pin";
 
-type PublishBody = { spectatorId?: string; leagueId?: string; league?: unknown; pin?: string | null; previousSpectatorId?: string | null };
+type PublishBody = { spectatorId?: string; leagueId?: string; league?: { updatedAt?: number } & Record<string, unknown>; pin?: string | null; previousSpectatorId?: string | null };
 
 function errorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : "Unexpected error";
@@ -18,6 +18,16 @@ export async function POST(request: Request) {
     if (!body.spectatorId || !body.leagueId || !body.league) return Response.json({ error: "spectatorId, leagueId y league son obligatorios." }, { status: 400 });
 
     const db = getDb();
+
+    // Retries (from the offline sync queue's backoff) can arrive out of order. Never let a stale snapshot
+    // clobber a fresher one that already landed — this is what keeps the queue's ordering guarantee real.
+    const [existing] = await db.select().from(spectatorSnapshots).where(eq(spectatorSnapshots.spectatorId, body.spectatorId)).limit(1);
+    if (existing) {
+      const existingLeagueUpdatedAt = (JSON.parse(existing.payload) as { updatedAt?: number }).updatedAt ?? 0;
+      const incomingLeagueUpdatedAt = body.league.updatedAt ?? 0;
+      if (incomingLeagueUpdatedAt < existingLeagueUpdatedAt) return Response.json({ ok: true, skipped: "stale" });
+    }
+
     // `pin` is only present on the request when the admin is explicitly setting/clearing it from the
     // spectator settings panel. Routine background syncs omit it entirely so they never clobber an
     // already-set PIN with null.
