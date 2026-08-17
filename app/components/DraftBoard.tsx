@@ -18,6 +18,17 @@ import PlayerCombobox from "./PlayerCombobox";
 import SpectatorPanel from "./SpectatorPanel";
 
 const PLAYERS = playerCatalog as Player[];
+const playerListCache = new Map<string, Player[]>();
+
+function playersForSlot(slot: Slot): Player[] {
+  const positions = allowedPositions(slot);
+  const key = positions.join("|");
+  const cached = playerListCache.get(key);
+  if (cached) return cached;
+  const list = positions.length === POSITIONS.length ? PLAYERS : PLAYERS.filter((player) => positions.includes(player.posicion));
+  playerListCache.set(key, list);
+  return list;
+}
 
 function draftedNames(league: League): Set<string> {
   return new Set(league.purchases.map((purchase) => normalizedPlayerName(purchase.playerName)));
@@ -200,7 +211,7 @@ function BoardCell({ league, team, slot, purchase, onRegister, onEdit, onMove }:
     });
   }, [purchase]);
 
-  const positionPlayers = PLAYERS.filter((item) => allowedPositions(slot).includes(item.posicion));
+  const positionPlayers = playersForSlot(slot);
 
   const commit = (nextJugador: string, nextPrecio: string) => {
     if (!nextJugador.trim() || nextPrecio === "") return;

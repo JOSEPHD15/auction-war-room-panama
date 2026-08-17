@@ -49,3 +49,13 @@ test("allows preparing the first purchase before manually starting the draft", a
   assert.match(board, /disabled=\{league\.status === "FINALIZADO"\}/);
   assert.match(board, /primera compra, el draft comenzará automáticamente/);
 });
+
+test("keeps player search lightweight across the full board", async () => {
+  const [combo, board] = await Promise.all([
+    readFile(new URL("../app/components/PlayerCombobox.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/components/DraftBoard.tsx", import.meta.url), "utf8"),
+  ]);
+  assert.match(combo, /if \(!open\) return \[\]/);
+  assert.doesNotMatch(combo, /players\.filter\([^\n]+findIndex/);
+  assert.match(board, /playerListCache/);
+});

@@ -5,7 +5,8 @@ import { money } from "../lib/formulas";
 import { searchKey } from "../lib/text";
 import type { League, Player } from "../lib/types";
 
-type Option = { player: Player; rank: number; taken: { teamName: string; price: number } | null };
+type RankedPlayer = { player: Player; rank: number; key: string };
+type Option = RankedPlayer & { taken: { teamName: string; price: number } | null };
 
 export default function PlayerCombobox({ value, onChange, league, players, id, placeholder, disabled }: { value: string; onChange: (value: string) => void; league: League; players: Player[]; id: string; placeholder?: string; disabled?: boolean }) {
   const [open, setOpen] = useState(false);
@@ -19,20 +20,25 @@ export default function PlayerCombobox({ value, onChange, league, players, id, p
       map.set(searchKey(purchase.playerName), { teamName: team?.name || "", price: purchase.price });
     });
     return map;
-  }, [league]);
+  }, [league.purchases, league.teams]);
+
+  const rankedPlayers: RankedPlayer[] = useMemo(() => {
+    const counters = new Map<string, number>();
+    return players.map((player) => {
+      const rank = (counters.get(player.posicion) || 0) + 1;
+      counters.set(player.posicion, rank);
+      return { player, rank, key: searchKey(player.nombre) };
+    });
+  }, [players]);
 
   const results: Option[] = useMemo(() => {
+    // The board can mount well over 100 comboboxes. Only the focused one should perform search work.
+    if (!open) return [];
     const query = searchKey(value);
-    const withRank = players.map((player) => ({
-      player,
-      rank: players.filter((item) => item.posicion === player.posicion).findIndex((item) => item.nombre === player.nombre) + 1,
-      taken: purchaseByKey.get(searchKey(player.nombre)) || null,
-    }));
-    const filtered = query ? withRank.filter((item) => searchKey(item.player.nombre).includes(query)) : withRank;
+    const withStatus = rankedPlayers.map((item) => ({ ...item, taken: purchaseByKey.get(item.key) || null }));
+    const filtered = query ? withStatus.filter((item) => item.key.includes(query)) : withStatus;
     return filtered.sort((a, b) => (a.taken ? 1 : 0) - (b.taken ? 1 : 0) || a.player.posicion.localeCompare(b.player.posicion) || a.rank - b.rank).slice(0, 40);
-  }, [players, value, purchaseByKey]);
-
-  useEffect(() => { queueMicrotask(() => setHighlight(0)); }, [value, open]);
+  }, [open, value, purchaseByKey, rankedPlayers]);
 
   useEffect(() => {
     function handleOutsideClick(event: MouseEvent) {
@@ -67,8 +73,8 @@ export default function PlayerCombobox({ value, onChange, league, players, id, p
         role="combobox"
         aria-expanded={open}
         aria-controls={`${id}-listbox`}
-        onChange={(event) => { onChange(event.target.value); setOpen(true); }}
-        onFocus={() => setOpen(true)}
+        onChange={(event) => { onChange(event.target.value); setHighlight(0); setOpen(true); }}
+        onFocus={() => { setHighlight(0); setOpen(true); }}
         onKeyDown={handleKeyDown}
       />
       {open && results.length > 0 && (
