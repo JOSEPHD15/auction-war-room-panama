@@ -17,7 +17,9 @@ import ManagersPanel from "./ManagersPanel";
 import PlayerCombobox from "./PlayerCombobox";
 import SpectatorPanel from "./SpectatorPanel";
 
-const PLAYERS = playerCatalog as Player[];
+// The source list is stored in overall-ranking order. Keep that rank attached even when a
+// board cell filters the catalog down to one position.
+const PLAYERS: Player[] = (playerCatalog as Player[]).map((player, index) => ({ ...player, rankOverall: index + 1 }));
 const playerListCache = new Map<string, Player[]>();
 
 function playersForSlot(slot: Slot): Player[] {

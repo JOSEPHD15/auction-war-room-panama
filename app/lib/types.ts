@@ -1,5 +1,5 @@
 export type Position = "QB" | "RB" | "WR" | "TE" | "K" | "DEF";
-export type Player = { nombre: string; posicion: Position; equipoNFL: string };
+export type Player = { nombre: string; posicion: Position; equipoNFL: string; rankOverall?: number };
 
 export type DraftStatus = "PRE-DRAFT" | "LIVE" | "FINALIZADO";
 

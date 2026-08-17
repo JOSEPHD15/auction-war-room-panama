@@ -58,4 +58,7 @@ test("keeps player search lightweight across the full board", async () => {
   assert.match(combo, /if \(!open\) return \[\]/);
   assert.doesNotMatch(combo, /players\.filter\([^\n]+findIndex/);
   assert.match(board, /playerListCache/);
+  assert.match(board, /rankOverall: index \+ 1/);
+  assert.match(combo, /a\.rank - b\.rank/);
+  assert.match(combo, /OVR #/);
 });

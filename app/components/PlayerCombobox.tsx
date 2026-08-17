@@ -23,12 +23,7 @@ export default function PlayerCombobox({ value, onChange, league, players, id, p
   }, [league.purchases, league.teams]);
 
   const rankedPlayers: RankedPlayer[] = useMemo(() => {
-    const counters = new Map<string, number>();
-    return players.map((player) => {
-      const rank = (counters.get(player.posicion) || 0) + 1;
-      counters.set(player.posicion, rank);
-      return { player, rank, key: searchKey(player.nombre) };
-    });
+    return players.map((player, index) => ({ player, rank: player.rankOverall ?? index + 1, key: searchKey(player.nombre) }));
   }, [players]);
 
   const results: Option[] = useMemo(() => {
@@ -37,7 +32,7 @@ export default function PlayerCombobox({ value, onChange, league, players, id, p
     const query = searchKey(value);
     const withStatus = rankedPlayers.map((item) => ({ ...item, taken: purchaseByKey.get(item.key) || null }));
     const filtered = query ? withStatus.filter((item) => item.key.includes(query)) : withStatus;
-    return filtered.sort((a, b) => (a.taken ? 1 : 0) - (b.taken ? 1 : 0) || a.player.posicion.localeCompare(b.player.posicion) || a.rank - b.rank).slice(0, 40);
+    return filtered.sort((a, b) => (a.taken ? 1 : 0) - (b.taken ? 1 : 0) || a.rank - b.rank).slice(0, 40);
   }, [open, value, purchaseByKey, rankedPlayers]);
 
   useEffect(() => {
@@ -90,7 +85,7 @@ export default function PlayerCombobox({ value, onChange, league, players, id, p
             >
               <span className="combobox-pos">{item.player.posicion}</span>
               <span className="combobox-name">{item.player.nombre}</span>
-              {item.taken ? <span className="combobox-taken">VENDIDO · {item.taken.teamName} · {money(item.taken.price)}</span> : <span className="combobox-rank">#{item.rank}</span>}
+              {item.taken ? <span className="combobox-taken">VENDIDO · {item.taken.teamName} · {money(item.taken.price)}</span> : <span className="combobox-rank">OVR #{item.rank}</span>}
             </li>
           ))}
         </ul>
