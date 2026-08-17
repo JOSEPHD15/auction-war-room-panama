@@ -13,6 +13,7 @@ import { normalizedPlayerName, searchKey } from "../lib/text";
 import { shareOrDownloadTeamCard } from "../lib/teamCardPng";
 import type { League, Player, Position, Purchase, RosterCounts, Slot, Team } from "../lib/types";
 import PlayerCombobox from "./PlayerCombobox";
+import SpectatorPanel from "./SpectatorPanel";
 
 const PLAYERS = playerCatalog as Player[];
 
@@ -78,6 +79,8 @@ export default function DraftBoard({ league, onChange }: { league: League; onCha
       </div>
 
       <DraftStatusBar league={league} onStart={startNow} onFinalize={finalizeNow} onReopen={reopenNow} />
+
+      <SpectatorPanel league={league} onChange={onChange} />
 
       {configOpen && (
         league.status === "PRE-DRAFT"
@@ -279,7 +282,7 @@ function CompetitiveIntel({ league, player, onClose }: { league: League; player:
   );
 }
 
-function ActivityFeed({ league }: { league: League }) {
+export function ActivityFeed({ league }: { league: League }) {
   const entries = buildActivityFeed(league, 40);
   return (
     <section>
@@ -334,7 +337,7 @@ function EditPurchaseForm({ league, purchase, onSave, onCancel }: { league: Leag
   );
 }
 
-function TeamControl({ league }: { league: League }) {
+export function TeamControl({ league }: { league: League }) {
   return (
     <>
       <div className="section-heading"><div><span className="eyebrow">Control financiero</span><h2>Poder de compra por equipo</h2></div><p>Máxima puja reserva ${league.config.minimumBid} por cada slot pendiente.</p></div>
@@ -386,7 +389,7 @@ function PostDraftReport({ league }: { league: League }) {
   );
 }
 
-function NeedsTable({ league }: { league: League }) {
+export function NeedsTable({ league }: { league: League }) {
   const targets = league.config.roster;
   return (
     <div>

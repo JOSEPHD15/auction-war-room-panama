@@ -17,8 +17,15 @@ function isValidLeagueShape(value: unknown): value is League {
 
 /** Backfills fields added after a league was first saved, so older saved leagues keep working without a hard schema migration. */
 function normalizeLeague(league: League): League {
-  if (typeof league.config.scoring === "string") return league;
-  return { ...league, config: { ...league.config, scoring: DEFAULT_SCORING } };
+  const needsScoring = typeof league.config.scoring !== "string";
+  const needsSpectatorFields = typeof league.spectatorId === "undefined" || typeof league.spectatorPinEnabled === "undefined";
+  if (!needsScoring && !needsSpectatorFields) return league;
+  return {
+    ...league,
+    config: needsScoring ? { ...league.config, scoring: DEFAULT_SCORING } : league.config,
+    spectatorId: typeof league.spectatorId === "undefined" ? null : league.spectatorId,
+    spectatorPinEnabled: typeof league.spectatorPinEnabled === "undefined" ? false : league.spectatorPinEnabled,
+  };
 }
 
 export function loadAppData(): AppData | null {
@@ -141,6 +148,8 @@ function buildLeagueFromLegacy(legacy: LegacyData): League {
     teams,
     purchases,
     eventLog,
+    spectatorId: null,
+    spectatorPinEnabled: false,
   };
 }
 

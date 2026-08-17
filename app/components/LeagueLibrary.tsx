@@ -5,6 +5,7 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { renameLeague } from "../lib/draftStatus";
 import { downloadJSON } from "../lib/download";
 import { duplicateLeague, exportAllLeaguesPayload, exportLeaguePayload, parseImportFile, withFreshId } from "../lib/leagues";
+import { disableSpectatorSnapshot } from "../lib/spectator";
 import { deleteLeague, listLeagueSummaries, loadLeague, saveLeague } from "../lib/storage";
 import type { LeagueSummary } from "../lib/types";
 import CreateLeagueForm from "./CreateLeagueForm";
@@ -42,11 +43,13 @@ export default function LeagueLibrary() {
     setToast("Liga duplicada.");
   };
 
-  const handleDelete = (id: string, name: string) => {
+  const handleDelete = async (id: string, name: string) => {
     if (!confirm(`¿Eliminar la liga "${name}"? Esta acción no se puede deshacer.`)) return;
+    const league = loadLeague(id);
     deleteLeague(id);
     refresh();
     setToast("Liga eliminada.");
+    if (league?.spectatorId) await disableSpectatorSnapshot(league.spectatorId);
   };
 
   const handleExportExcel = async (id: string) => {

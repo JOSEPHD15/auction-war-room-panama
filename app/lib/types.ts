@@ -58,6 +58,10 @@ export type League = {
   teams: Team[];
   purchases: Purchase[];
   eventLog: LeagueEvent[];
+  /** null = spectator sharing off. A long, unpredictable id — never the league name or a sequential id. */
+  spectatorId: string | null;
+  /** UI-only flag; the actual PIN hash lives server-side in D1, never in localStorage. */
+  spectatorPinEnabled: boolean;
 };
 
 export type AppData = {
