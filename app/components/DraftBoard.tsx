@@ -184,18 +184,23 @@ function LastPurchase({ league, lastPurchase, onRegister, onUndo, canUndo }: { l
   const submit = () => { if (price !== "" && onRegister(player, teamId, Number(price))) { setPlayer(""); setPrice(""); } };
   return (
     <article className={`last-pick-hero ${lastPurchase ? "has-pick" : ""}`}>
-      <div className="last-pick-label"><i /> ÚLTIMA COMPRA</div>
-      <div className="last-pick-main">
-        <div><span>{lastPurchase?.position || "EN ESPERA"}</span><h2>{lastPurchase?.playerName || "Esperando la primera compra"}</h2><p>{lastPurchase ? `${league.teams.find((item) => item.id === lastPurchase.teamId)?.name || ""} · ${slot?.label || ""}` : "También puedes registrar la compra directamente aquí."}</p></div>
-        <strong>{lastPurchase ? money(lastPurchase.price) : "$—"}</strong>
-      </div>
-      <div className="quick-purchase">
-        <label htmlFor="quick-player-list">JUGADOR<PlayerCombobox value={player} onChange={setPlayer} league={league} players={PLAYERS} id="quick-player-list" disabled={league.status === "FINALIZADO"} /></label>
-        <label>EQUIPO<select value={teamId} disabled={league.status === "FINALIZADO"} onChange={(event) => setTeamId(event.target.value)}>{league.teams.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-        <label htmlFor="quick-price">PRECIO<div className="quick-price"><span>$</span><input id="quick-price" type="number" min={league.config.minimumBid} value={price} disabled={league.status === "FINALIZADO"} onChange={(event) => setPrice(event.target.value)} placeholder="0" onKeyDown={(event) => { if (event.key === "Enter" && player && team && price !== "") submit(); }} /></div></label>
-        <button className="register-button" onClick={submit} disabled={league.status === "FINALIZADO"}>VENDIDO</button>
-        <button className="undo-button" disabled={!canUndo} onClick={onUndo}>↶ Deshacer</button>
-      </div>
+      <section className="last-pick-summary">
+        <div className="last-pick-label"><i /> ÚLTIMA COMPRA</div>
+        <div className="last-pick-main">
+          <div><span>{lastPurchase?.position || "EN ESPERA"}</span><h2>{lastPurchase?.playerName || "Aún sin compras"}</h2><p>{lastPurchase ? `${league.teams.find((item) => item.id === lastPurchase.teamId)?.name || ""} · ${slot?.label || ""}` : "El primer jugador vendido aparecerá aquí."}</p></div>
+          <strong>{lastPurchase ? money(lastPurchase.price) : "$—"}</strong>
+        </div>
+      </section>
+      <section className="purchase-entry-panel">
+        <div className="purchase-entry-head"><div><span className="eyebrow">Entrada rápida</span><h3>Registrar compra</h3></div><small>Busca · selecciona · vende</small></div>
+        <div className="quick-purchase">
+          <label className="quick-player-control" htmlFor="quick-player-list">JUGADOR<PlayerCombobox value={player} onChange={setPlayer} league={league} players={PLAYERS} id="quick-player-list" placeholder="Escribe un nombre…" disabled={league.status === "FINALIZADO"} /></label>
+          <label className="quick-team-control">EQUIPO<select value={teamId} disabled={league.status === "FINALIZADO"} onChange={(event) => setTeamId(event.target.value)}>{league.teams.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+          <label className="quick-price-control" htmlFor="quick-price">PRECIO<div className="quick-price"><span>$</span><input id="quick-price" type="number" min={league.config.minimumBid} value={price} disabled={league.status === "FINALIZADO"} onChange={(event) => setPrice(event.target.value)} placeholder="0" onKeyDown={(event) => { if (event.key === "Enter" && player && team && price !== "") submit(); }} /></div></label>
+          <button className="register-button" onClick={submit} disabled={league.status === "FINALIZADO" || !player || price === ""}>VENDIDO</button>
+          <button className="undo-button" disabled={!canUndo} onClick={onUndo}>↶ Deshacer</button>
+        </div>
+      </section>
     </article>
   );
 }
