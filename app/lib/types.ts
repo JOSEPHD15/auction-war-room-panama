@@ -9,7 +9,7 @@ export type Team = { id: string; name: string };
 
 export type RosterCounts = { QB: number; RB: number; WR: number; TE: number; K: number; DEF: number; FLEX: number; BENCH: number };
 
-export type LeagueConfig = { budget: number; minimumBid: number; roster: RosterCounts; slots: Slot[] };
+export type LeagueConfig = { budget: number; minimumBid: number; scoring: string; roster: RosterCounts; slots: Slot[] };
 
 export type Purchase = {
   id: string;

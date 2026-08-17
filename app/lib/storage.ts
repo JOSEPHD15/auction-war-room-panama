@@ -1,4 +1,4 @@
-import { buildSlots, DEFAULT_BUDGET, DEFAULT_MINIMUM_BID, DEFAULT_ROSTER } from "./formulas";
+import { buildSlots, DEFAULT_BUDGET, DEFAULT_MINIMUM_BID, DEFAULT_ROSTER, DEFAULT_SCORING } from "./formulas";
 import { makeId } from "./ids";
 import type { AppData, League, LeagueEvent, LeagueSummary, Position, Purchase } from "./types";
 
@@ -13,6 +13,12 @@ function isValidLeagueShape(value: unknown): value is League {
   if (!value || typeof value !== "object") return false;
   const league = value as League;
   return typeof league.id === "string" && Array.isArray(league.teams) && Array.isArray(league.purchases) && Array.isArray(league.eventLog) && !!league.config && Array.isArray(league.config.slots);
+}
+
+/** Backfills fields added after a league was first saved, so older saved leagues keep working without a hard schema migration. */
+function normalizeLeague(league: League): League {
+  if (typeof league.config.scoring === "string") return league;
+  return { ...league, config: { ...league.config, scoring: DEFAULT_SCORING } };
 }
 
 export function loadAppData(): AppData | null {
@@ -40,7 +46,7 @@ export function loadLeague(id: string): League | null {
     const raw = localStorage.getItem(LEAGUE_PREFIX + id);
     if (!raw) return null;
     const data = JSON.parse(raw);
-    return isValidLeagueShape(data) ? data : null;
+    return isValidLeagueShape(data) ? normalizeLeague(data) : null;
   } catch {
     return null;
   }
@@ -131,7 +137,7 @@ function buildLeagueFromLegacy(legacy: LegacyData): League {
     createdAt,
     updatedAt: now,
     status: purchases.length > 0 ? "LIVE" : "PRE-DRAFT",
-    config: { budget: DEFAULT_BUDGET, minimumBid: DEFAULT_MINIMUM_BID, roster: DEFAULT_ROSTER, slots },
+    config: { budget: DEFAULT_BUDGET, minimumBid: DEFAULT_MINIMUM_BID, scoring: DEFAULT_SCORING, roster: DEFAULT_ROSTER, slots },
     teams,
     purchases,
     eventLog,
@@ -146,7 +152,9 @@ export function ensureMigrated(): void {
     const legacy = JSON.parse(legacyRaw) as LegacyData;
     const league = buildLeagueFromLegacy(legacy);
     saveLeague(league);
-    saveAppData({ schemaVersion: SCHEMA_VERSION, appVersion: APP_VERSION, lastOpenedLeagueId: league.id, dark: typeof legacy.dark === "boolean" ? legacy.dark : true });
+    // lastOpenedLeagueId stays null on purpose: the public "/" route never auto-opens a league,
+    // even the one just migrated. It becomes visible and openable from "Mis ligas".
+    saveAppData({ schemaVersion: SCHEMA_VERSION, appVersion: APP_VERSION, lastOpenedLeagueId: null, dark: typeof legacy.dark === "boolean" ? legacy.dark : true });
   } catch {
     // Never let a corrupt legacy save block the app; the legacy key is left untouched either way.
   }

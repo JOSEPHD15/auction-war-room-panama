@@ -1,9 +1,9 @@
-import { buildSlots, DEFAULT_BUDGET, DEFAULT_MINIMUM_BID, DEFAULT_ROSTER } from "./formulas";
+import { buildSlots, DEFAULT_BUDGET, DEFAULT_MINIMUM_BID, DEFAULT_ROSTER, DEFAULT_SCORING } from "./formulas";
 import { makeId } from "./ids";
 import { APP_VERSION, SCHEMA_VERSION } from "./storage";
 import type { DraftStatus, League, LeagueEvent, Position, Purchase, RosterCounts, Slot, Team } from "./types";
 
-export type CreateLeagueInput = { name: string; season: string; teamCount: number; budget?: number; minimumBid?: number; roster?: RosterCounts };
+export type CreateLeagueInput = { name: string; season: string; teamCount: number; budget?: number; minimumBid?: number; scoring?: string; roster?: RosterCounts };
 
 export function defaultTeamNames(count: number): string[] {
   return Array.from({ length: count }, (_, index) => `Equipo ${index + 1}`);
@@ -23,7 +23,7 @@ export function createLeague(input: CreateLeagueInput): League {
     createdAt: now,
     updatedAt: now,
     status: "PRE-DRAFT",
-    config: { budget: input.budget ?? DEFAULT_BUDGET, minimumBid: input.minimumBid ?? DEFAULT_MINIMUM_BID, roster, slots: buildSlots(roster) },
+    config: { budget: input.budget ?? DEFAULT_BUDGET, minimumBid: input.minimumBid ?? DEFAULT_MINIMUM_BID, scoring: input.scoring?.trim() || DEFAULT_SCORING, roster, slots: buildSlots(roster) },
     teams,
     purchases: [],
     eventLog: [createdEvent],
@@ -106,7 +106,7 @@ export function validateLeague(value: unknown): { ok: true; league: League } | {
   if (typeof league.id !== "string" || !league.id) return { ok: false, error: "Falta el ID de la liga." };
   if (typeof league.name !== "string" || !league.name.trim()) return { ok: false, error: "Falta el nombre de la liga." };
   if (!VALID_STATUSES.includes(league.status)) return { ok: false, error: "Estado de draft inválido." };
-  if (!league.config || typeof league.config.budget !== "number" || typeof league.config.minimumBid !== "number") return { ok: false, error: "Configuración de liga inválida." };
+  if (!league.config || typeof league.config.budget !== "number" || typeof league.config.minimumBid !== "number" || typeof league.config.scoring !== "string") return { ok: false, error: "Configuración de liga inválida." };
   if (!Array.isArray(league.config.slots) || !league.config.slots.every(isSlot)) return { ok: false, error: "Los slots de la liga son inválidos." };
   if (!Array.isArray(league.teams) || !league.teams.every(isTeam)) return { ok: false, error: "Los equipos de la liga son inválidos." };
   const slotIds = new Set(league.config.slots.map((slot) => slot.id));

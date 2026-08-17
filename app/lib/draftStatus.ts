@@ -29,7 +29,7 @@ export function resetPurchases(league: League): League {
   return { ...appendEvent(league, "LEAGUE_UPDATED", { reset: true }), purchases: [] };
 }
 
-export type LeagueConfigPatch = { name?: string; season?: string; teamNames?: string[]; budget?: number; minimumBid?: number; roster?: RosterCounts };
+export type LeagueConfigPatch = { name?: string; season?: string; teamNames?: string[]; budget?: number; minimumBid?: number; scoring?: string; roster?: RosterCounts };
 
 export function updateLeagueConfig(league: League, patch: LeagueConfigPatch): StatusResult {
   if (league.status !== "PRE-DRAFT") return { ok: false, error: "La configuración solo se puede editar en PRE-DRAFT." };
@@ -40,7 +40,7 @@ export function updateLeagueConfig(league: League, patch: LeagueConfigPatch): St
     name: patch.name?.trim() || league.name,
     season: patch.season?.trim() || league.season,
     teams,
-    config: { budget: patch.budget ?? league.config.budget, minimumBid: patch.minimumBid ?? league.config.minimumBid, roster, slots: patch.roster ? buildSlots(roster) : league.config.slots },
+    config: { budget: patch.budget ?? league.config.budget, minimumBid: patch.minimumBid ?? league.config.minimumBid, scoring: patch.scoring?.trim() || league.config.scoring, roster, slots: patch.roster ? buildSlots(roster) : league.config.slots },
   };
   return { ok: true, league: appendEvent(withConfig, "LEAGUE_UPDATED", { config: true }) };
 }
@@ -48,4 +48,11 @@ export function updateLeagueConfig(league: League, patch: LeagueConfigPatch): St
 export function renameTeams(league: League, names: Record<string, string>): League {
   const teams = league.teams.map((team) => ({ ...team, name: names[team.id]?.trim() || team.name }));
   return appendEvent({ ...league, teams }, "LEAGUE_UPDATED", { renamed: true });
+}
+
+/** Renaming the league itself is always allowed — it's metadata, not draft state, and touches no purchases/slots. */
+export function renameLeague(league: League, name: string): League {
+  const trimmed = name.trim();
+  if (!trimmed || trimmed === league.name) return league;
+  return appendEvent({ ...league, name: trimmed }, "LEAGUE_UPDATED", { renamedLeague: true });
 }

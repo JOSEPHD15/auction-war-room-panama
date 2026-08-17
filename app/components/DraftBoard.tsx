@@ -64,7 +64,7 @@ export default function DraftBoard({ league, onChange }: { league: League; onCha
   return (
     <section className="page-shell">
       <div className="page-intro">
-        <div><span className="eyebrow">Sala de subasta</span><h1>Draft Board</h1><p>Compras, presupuestos y poder de puja de toda la liga en tiempo real.</p></div>
+        <div><span className="eyebrow">Sala de subasta · {league.config.scoring} · Temporada {league.season}</span><h1>Draft Board</h1><p>Compras, presupuestos y poder de puja de toda la liga en tiempo real.</p></div>
         <div className="intro-actions">
           <button className="ghost-button" onClick={() => setConfigOpen((value) => !value)}>⚙ Editar liga</button>
           {league.status !== "FINALIZADO" && <button className="danger-button" onClick={resetBoard}>Vaciar compras</button>}
@@ -100,12 +100,13 @@ function DraftStatusBar({ league, onStart, onFinalize, onReopen }: { league: Lea
   return <div className="draft-status-bar"><span className="status-pill status-done">FINALIZADO</span><p>Draft finalizado: el tablero queda de solo lectura, pero puedes exportarlo.</p><button className="ghost-button" onClick={onReopen}>Reabrir Draft</button></div>;
 }
 
-function LeagueConfigForm({ league, onSave, onCancel }: { league: League; onSave: (patch: { name: string; season: string; teamNames: string[]; budget: number; minimumBid: number; roster: RosterCounts }) => void; onCancel: () => void }) {
+function LeagueConfigForm({ league, onSave, onCancel }: { league: League; onSave: (patch: { name: string; season: string; teamNames: string[]; budget: number; minimumBid: number; scoring: string; roster: RosterCounts }) => void; onCancel: () => void }) {
   const [name, setName] = useState(league.name);
   const [season, setSeason] = useState(league.season);
   const [teamNames, setTeamNames] = useState(league.teams.map((team) => team.name));
   const [budget, setBudget] = useState(league.config.budget);
   const [minimumBid, setMinimumBid] = useState(league.config.minimumBid);
+  const [scoring, setScoring] = useState(league.config.scoring);
   const [roster, setRoster] = useState<RosterCounts>(league.config.roster);
 
   const changeTeamCount = (count: number) => setTeamNames((current) => Array.from({ length: Math.min(16, Math.max(2, count)) }, (_, index) => current[index] || `Equipo ${index + 1}`));
@@ -120,6 +121,7 @@ function LeagueConfigForm({ league, onSave, onCancel }: { league: League; onSave
         <label className="form-field"><span>Equipos</span><input type="number" min="2" max="16" value={teamNames.length} onChange={(event) => changeTeamCount(Number(event.target.value))} /></label>
         <label className="form-field"><span>Presupuesto</span><input type="number" min="1" value={budget} onChange={(event) => setBudget(Math.max(1, Number(event.target.value) || 1))} /></label>
         <label className="form-field"><span>Puja mínima</span><input type="number" min="0" value={minimumBid} onChange={(event) => setMinimumBid(Math.max(0, Number(event.target.value) || 0))} /></label>
+        <label className="form-field"><span>Puntuación</span><input value={scoring} onChange={(event) => setScoring(event.target.value)} list="scoring-presets-config" /><datalist id="scoring-presets-config"><option value="Standard" /><option value="0.5 PPR" /><option value="PPR" /></datalist></label>
       </div>
       <div className="team-name-grid">{teamNames.map((teamName, index) => <label key={index}><span>{index + 1}</span><input value={teamName} onChange={(event) => setTeamNames((current) => current.map((value, itemIndex) => itemIndex === index ? event.target.value : value))} /></label>)}</div>
       <div className="field-grid">
@@ -127,7 +129,7 @@ function LeagueConfigForm({ league, onSave, onCancel }: { league: League; onSave
         <label className="form-field"><span>FLEX</span><input type="number" min="0" value={roster.FLEX} onChange={(event) => setRosterField("FLEX", Number(event.target.value) || 0)} /></label>
         <label className="form-field"><span>BANCA</span><input type="number" min="0" value={roster.BENCH} onChange={(event) => setRosterField("BENCH", Number(event.target.value) || 0)} /></label>
       </div>
-      <div className="settings-actions"><button className="ghost-button" onClick={onCancel}>Cancelar</button><button className="save-button" onClick={() => onSave({ name, season, teamNames, budget, minimumBid, roster })}>Guardar</button></div>
+      <div className="settings-actions"><button className="ghost-button" onClick={onCancel}>Cancelar</button><button className="save-button" onClick={() => onSave({ name, season, teamNames, budget, minimumBid, scoring, roster })}>Guardar</button></div>
     </div>
   );
 }

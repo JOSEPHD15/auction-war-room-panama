@@ -6,6 +6,8 @@ export const POSITIONS: Position[] = ["QB", "RB", "WR", "TE", "K", "DEF"];
 export const DEFAULT_ROSTER: RosterCounts = { QB: 1, RB: 2, WR: 2, TE: 1, K: 1, DEF: 1, FLEX: 1, BENCH: 5 };
 export const DEFAULT_BUDGET = 200;
 export const DEFAULT_MINIMUM_BID = 1;
+export const DEFAULT_SCORING = "0.5 PPR";
+export const SCORING_PRESETS = ["Standard", "0.5 PPR", "PPR"];
 
 function categorySlots(position: Position, count: number): Slot[] {
   return Array.from({ length: count }, (_, index) => ({
