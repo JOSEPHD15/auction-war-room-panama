@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import CreateLeagueForm from "./components/CreateLeagueForm";
 import Shell from "./components/Shell";
 
 export default function Home() {
   return (
-    <Shell headerRight={<Link prefetch={false} className="ghost-button header-library-link" href="/mis-ligas">Mis ligas</Link>}>
+    <Shell headerRight={<a className="ghost-button header-library-link" href="/mis-ligas">Mis ligas</a>}>
       <section className="page-shell landing-shell">
         <div className="landing-grid">
           <div className="landing-copy">
@@ -18,7 +17,7 @@ export default function Home() {
               <span><b>02</b> Multi-liga</span>
               <span><b>03</b> Spectator mode</span>
             </div>
-            <Link prefetch={false} href="/mis-ligas" className="text-link">Abrir ligas guardadas <span>→</span></Link>
+            <a href="/mis-ligas" className="text-link">Abrir ligas guardadas <span>→</span></a>
           </div>
 
           <div className="landing-create"><CreateLeagueForm title="Configura tu war room" /></div>

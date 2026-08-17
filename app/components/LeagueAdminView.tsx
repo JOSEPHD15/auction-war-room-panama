@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { downloadJSON } from "../lib/download";
 import { exportLeaguePayload } from "../lib/leagues";
@@ -45,7 +44,7 @@ export default function LeagueAdminView({ leagueId }: { leagueId: string }) {
           <div className="empty-state">
             <b>No se encontró esta liga en este dispositivo</b>
             <span>El enlace puede pertenecer a otro navegador o la liga fue eliminada.</span>
-            <p><Link prefetch={false} className="save-button" href="/mis-ligas">Ir a Mis ligas</Link></p>
+            <p><a className="save-button" href="/mis-ligas">Ir a Mis ligas</a></p>
           </div>
         </section>
       </Shell>
