@@ -23,10 +23,17 @@ export default function LeagueAdminView({ leagueId }: { leagueId: string }) {
 
   const handleChange = (updated: League) => setLeague(saveLeague(updated));
 
-  const exportCurrentLeague = () => {
+  const exportExcel = async () => {
+    if (!league) return;
+    const { downloadLeagueExcel } = await import("../lib/exportExcel");
+    downloadLeagueExcel(league);
+    setToast("Excel exportado.");
+  };
+
+  const exportJson = () => {
     if (!league) return;
     downloadJSON(exportLeaguePayload(league), `${league.name.replace(/\s+/g, "-").toLowerCase()}.json`);
-    setToast("Liga exportada.");
+    setToast("Respaldo JSON exportado.");
   };
 
   if (league === undefined) return <Shell backHref="/mis-ligas" backLabel="← Mis ligas"><section className="page-shell"><div className="empty-state"><b>Cargando liga…</b></div></section></Shell>;
@@ -50,7 +57,10 @@ export default function LeagueAdminView({ leagueId }: { leagueId: string }) {
       headerCenter={<>{league.name.toUpperCase()} <span>{league.status}</span></>}
       backHref="/mis-ligas"
       backLabel="← Mis ligas"
-      headerRight={<button className="ghost-button" onClick={exportCurrentLeague}>Exportar</button>}
+      headerRight={<>
+        <button className="save-button" onClick={exportExcel}>📊 Exportar Excel</button>
+        <button className="ghost-button" onClick={exportJson}>Respaldo JSON</button>
+      </>}
       footerRight={<span>{league.teams.length} equipos · ${league.config.budget} · {league.config.slots.length} slots</span>}
     >
       <DraftBoard league={league} onChange={handleChange} />

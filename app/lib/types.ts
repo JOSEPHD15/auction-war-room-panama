@@ -65,6 +65,7 @@ export type AppData = {
   appVersion: string;
   lastOpenedLeagueId: string | null;
   dark: boolean;
+  sound: boolean;
 };
 
 export type PurchaseInput = { teamId: string; playerName: string; price: number; slotId?: string };

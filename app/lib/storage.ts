@@ -27,14 +27,14 @@ export function loadAppData(): AppData | null {
     if (!raw) return null;
     const data = JSON.parse(raw);
     if (typeof data !== "object" || data === null) return null;
-    return { schemaVersion: Number(data.schemaVersion) || SCHEMA_VERSION, appVersion: data.appVersion || APP_VERSION, lastOpenedLeagueId: data.lastOpenedLeagueId ?? null, dark: typeof data.dark === "boolean" ? data.dark : true };
+    return { schemaVersion: Number(data.schemaVersion) || SCHEMA_VERSION, appVersion: data.appVersion || APP_VERSION, lastOpenedLeagueId: data.lastOpenedLeagueId ?? null, dark: typeof data.dark === "boolean" ? data.dark : true, sound: typeof data.sound === "boolean" ? data.sound : true };
   } catch {
     return null;
   }
 }
 
 export function getOrInitAppData(): AppData {
-  return loadAppData() ?? { schemaVersion: SCHEMA_VERSION, appVersion: APP_VERSION, lastOpenedLeagueId: null, dark: true };
+  return loadAppData() ?? { schemaVersion: SCHEMA_VERSION, appVersion: APP_VERSION, lastOpenedLeagueId: null, dark: true, sound: true };
 }
 
 export function saveAppData(data: AppData): void {
@@ -154,7 +154,7 @@ export function ensureMigrated(): void {
     saveLeague(league);
     // lastOpenedLeagueId stays null on purpose: the public "/" route never auto-opens a league,
     // even the one just migrated. It becomes visible and openable from "Mis ligas".
-    saveAppData({ schemaVersion: SCHEMA_VERSION, appVersion: APP_VERSION, lastOpenedLeagueId: null, dark: typeof legacy.dark === "boolean" ? legacy.dark : true });
+    saveAppData({ schemaVersion: SCHEMA_VERSION, appVersion: APP_VERSION, lastOpenedLeagueId: null, dark: typeof legacy.dark === "boolean" ? legacy.dark : true, sound: true });
   } catch {
     // Never let a corrupt legacy save block the app; the legacy key is left untouched either way.
   }

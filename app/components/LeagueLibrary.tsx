@@ -49,11 +49,19 @@ export default function LeagueLibrary() {
     setToast("Liga eliminada.");
   };
 
-  const handleExportOne = (id: string, name: string) => {
+  const handleExportExcel = async (id: string) => {
+    const league = loadLeague(id);
+    if (!league) { setToast("No se pudo exportar la liga."); return; }
+    const { downloadLeagueExcel } = await import("../lib/exportExcel");
+    downloadLeagueExcel(league);
+    setToast("Excel exportado.");
+  };
+
+  const handleExportJson = (id: string, name: string) => {
     const league = loadLeague(id);
     if (!league) { setToast("No se pudo exportar la liga."); return; }
     downloadJSON(exportLeaguePayload(league), `${name.replace(/\s+/g, "-").toLowerCase()}.json`);
-    setToast("Liga exportada.");
+    setToast("Respaldo JSON exportado.");
   };
 
   const handleExportAll = () => {
@@ -123,7 +131,8 @@ export default function LeagueLibrary() {
                 <button className="save-button" onClick={() => router.push(`/liga/${league.id}`)}>Abrir</button>
                 <button className="ghost-button" onClick={() => startRename(league)}>Renombrar</button>
                 <button className="ghost-button" onClick={() => handleDuplicate(league.id)}>Duplicar</button>
-                <button className="ghost-button" onClick={() => handleExportOne(league.id, league.name)}>Exportar</button>
+                <button className="ghost-button" onClick={() => handleExportExcel(league.id)}>📊 Excel</button>
+                <button className="ghost-button" onClick={() => handleExportJson(league.id, league.name)}>JSON</button>
                 <button className="danger-button" onClick={() => handleDelete(league.id, league.name)}>Eliminar</button>
               </div>
             </article>

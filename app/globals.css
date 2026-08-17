@@ -75,6 +75,32 @@ h1 { margin: 5px 0 6px; font-size: clamp(34px, 5vw, 62px); letter-spacing: -.055
 .league-card { display:flex; flex-direction:column; gap:10px; }
 .league-meta { margin:0; color:var(--muted); font-size:9px; }
 .rename-input { flex:1; height:28px; border:1px solid var(--accent); border-radius:5px; background:var(--input); color:inherit; padding:0 8px; font-size:12px; font-weight:750; }
+.combobox { position:relative; }
+.combobox-list { position:absolute; z-index:30; top:calc(100% + 4px); left:0; right:0; max-height:260px; overflow:auto; margin:0; padding:4px; list-style:none; border:1px solid var(--line); border-radius:8px; background:var(--panel); box-shadow:0 14px 40px var(--shadow); }
+.combobox-option { display:grid; grid-template-columns:32px 1fr auto; align-items:center; gap:6px; padding:6px 8px; border-radius:5px; font-size:11px; cursor:pointer; }
+.combobox-option.active { background:color-mix(in srgb, var(--accent) 16%, transparent); }
+.combobox-option.taken { cursor:not-allowed; opacity:.55; }
+.combobox-pos { color:var(--accent); font-size:8px; font-weight:900; }
+.combobox-name { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.combobox-rank { color:var(--muted); font-size:9px; font-weight:800; }
+.combobox-taken { color:var(--red); font-size:8px; font-weight:800; white-space:nowrap; }
+.activity-feed { max-height:360px; overflow:auto; }
+.activity-row { display:flex; justify-content:space-between; gap:12px; padding:8px 16px; border-bottom:1px solid var(--line); font-size:11px; }
+.activity-row:last-child { border-bottom:0; }
+.activity-time { color:var(--muted); font-size:9px; white-space:nowrap; }
+.ranked-player { cursor:pointer; }
+.ranked-player.active { background:color-mix(in srgb, var(--accent) 14%, transparent); }
+.intel-panel { margin-top:14px; border:1px solid color-mix(in srgb, var(--accent) 40%, var(--line)); border-radius:9px; background:var(--panel-2); padding:14px; }
+.intel-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.intel-head span { color:var(--muted); font-size:10px; }
+.intel-summary { margin:0 0 10px; color:var(--muted); font-size:10px; }
+.intel-list { display:flex; flex-direction:column; gap:6px; max-height:220px; overflow:auto; }
+.intel-row { display:flex; justify-content:space-between; padding:6px 10px; border:1px solid var(--line); border-radius:6px; background:var(--panel); font-size:11px; }
+.intel-row strong { color:var(--green); }
+.intel-empty { margin:0; color:var(--muted); font-size:10px; }
+.team-card-share { width:100%; margin-top:10px; font-size:9px; }
+.report-table td { text-align:right; }
+.report-table th:not(:first-child) { text-align:right; }
 .status-pill { font-size:8px; font-weight:900; letter-spacing:.08em; padding:3px 8px; border-radius:20px; text-transform:uppercase; white-space:nowrap; }
 .status-pre { background:color-mix(in srgb, var(--blue) 16%, transparent); color:var(--blue); }
 .status-live { background:color-mix(in srgb, var(--green) 16%, transparent); color:var(--green); }
