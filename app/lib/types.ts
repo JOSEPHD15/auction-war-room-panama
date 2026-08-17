@@ -39,6 +39,8 @@ export type LeagueEvent = {
   type: EventType;
   createdAt: number;
   updatedAt: number;
+  /** Who made the change. null until accounts/co-managers (Fase 6) exist — every event already carries the field so the Activity Feed and audit trail don't need a reshape later. */
+  updatedBy: string | null;
   operationId: string;
   version: number;
   payload: unknown;

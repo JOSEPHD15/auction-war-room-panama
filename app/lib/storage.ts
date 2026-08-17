@@ -124,9 +124,9 @@ function buildLeagueFromLegacy(legacy: LegacyData): League {
   purchases.sort((a, b) => a.createdAt - b.createdAt);
 
   const createdAt = purchases[0]?.createdAt ?? now;
-  const eventLog: LeagueEvent[] = [{ id: makeId("event"), leagueId, type: "LEAGUE_CREATED", createdAt, updatedAt: createdAt, operationId: makeId("op"), version: 1, payload: { migratedFromLegacy: true } }];
+  const eventLog: LeagueEvent[] = [{ id: makeId("event"), leagueId, type: "LEAGUE_CREATED", createdAt, updatedAt: createdAt, updatedBy: null, operationId: makeId("op"), version: 1, payload: { migratedFromLegacy: true } }];
   purchases.forEach((purchase) => {
-    eventLog.push({ id: makeId("event"), leagueId, type: "PLAYER_PURCHASED", createdAt: purchase.createdAt, updatedAt: purchase.createdAt, operationId: purchase.id, version: 1, payload: { purchaseId: purchase.id } });
+    eventLog.push({ id: makeId("event"), leagueId, type: "PLAYER_PURCHASED", createdAt: purchase.createdAt, updatedAt: purchase.createdAt, updatedBy: null, operationId: purchase.id, version: 1, payload: { purchaseId: purchase.id } });
   });
 
   return {

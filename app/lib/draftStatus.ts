@@ -6,7 +6,7 @@ type StatusResult = { ok: true; league: League } | { ok: false; error: string };
 
 function appendEvent(league: League, type: EventType, payload: unknown): League {
   const now = Date.now();
-  const event: LeagueEvent = { id: makeId("event"), leagueId: league.id, type, createdAt: now, updatedAt: now, operationId: makeId("op"), version: league.eventLog.length + 1, payload };
+  const event: LeagueEvent = { id: makeId("event"), leagueId: league.id, type, createdAt: now, updatedAt: now, updatedBy: null, operationId: makeId("op"), version: league.eventLog.length + 1, payload };
   return { ...league, updatedAt: now, eventLog: [...league.eventLog, event] };
 }
 

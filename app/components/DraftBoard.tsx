@@ -5,7 +5,7 @@ import playerCatalog from "../players.json";
 import { finalizeDraft, renameTeams, reopenDraft, resetPurchases, startDraft, updateLeagueConfig } from "../lib/draftStatus";
 import { allowedPositions, money, POSITIONS, statsFor } from "../lib/formulas";
 import { makeId } from "../lib/ids";
-import { applyPurchase, editPurchase, undoLastPurchase } from "../lib/purchaseEngine";
+import { applyPurchase, editPurchase, movePurchase, undoLastPurchase } from "../lib/purchaseEngine";
 import { normalizedPlayerName } from "../lib/text";
 import type { League, Player, Position, Purchase, RosterCounts, Slot, Team } from "../lib/types";
 
@@ -51,6 +51,7 @@ export default function DraftBoard({ league, onChange }: { league: League; onCha
 
   const registerPurchase = (playerName: string, teamId: string, price: number, slotId?: string) => apply(applyPurchase(league, { teamId, playerName, price, slotId }, makeId("op")), `${playerName} registrado.`);
   const applyEdit = (purchaseId: string, patch: { teamId?: string; playerName?: string; price?: number }) => apply(editPurchase(league, purchaseId, patch, makeId("op")), "Compra actualizada.");
+  const movePlayer = (purchaseId: string, targetSlotId: string) => apply(movePurchase(league, purchaseId, targetSlotId, makeId("op")), "Jugador movido de slot.");
   const undo = () => apply(undoLastPurchase(league, makeId("op")));
 
   const resetBoard = () => { if (confirm("¿Vaciar todas las compras de esta liga? El historial de auditoría se conserva.")) apply({ ok: true, league: resetPurchases(league) }, "Compras reiniciadas."); };
@@ -83,7 +84,7 @@ export default function DraftBoard({ league, onChange }: { league: League; onCha
 
       <div className="legend"><span><i className="dot dot-green" /> Poder de compra &gt; $40</span><span><i className="dot dot-red" /> Topado &lt; $6</span><span><i className="dot dot-gold" /> {PLAYERS.length} jugadores · duplicados bloqueados</span></div>
 
-      <DraftTable league={league} onRegister={registerPurchase} onEdit={applyEdit} />
+      <DraftTable league={league} onRegister={registerPurchase} onEdit={applyEdit} onMove={movePlayer} />
       <AvailablePlayers drafted={drafted} />
       <PurchaseHistory league={league} onEdit={applyEdit} />
       <TeamControl league={league} />
@@ -171,7 +172,7 @@ function LastPurchase({ league, lastPurchase, drafted, onRegister, onUndo, canUn
   );
 }
 
-function BoardCell({ league, team, slot, purchase, onRegister, onEdit }: { league: League; team: Team; slot: Slot; purchase: Purchase | null; onRegister: (playerName: string, teamId: string, price: number, slotId?: string) => boolean; onEdit: (purchaseId: string, patch: { teamId?: string; playerName?: string; price?: number }) => boolean }) {
+function BoardCell({ league, team, slot, purchase, onRegister, onEdit, onMove }: { league: League; team: Team; slot: Slot; purchase: Purchase | null; onRegister: (playerName: string, teamId: string, price: number, slotId?: string) => boolean; onEdit: (purchaseId: string, patch: { teamId?: string; playerName?: string; price?: number }) => boolean; onMove: (purchaseId: string, targetSlotId: string) => boolean }) {
   const [jugador, setJugador] = useState(purchase?.playerName || "");
   const [precio, setPrecio] = useState(purchase ? String(purchase.price) : "");
 
@@ -192,6 +193,8 @@ function BoardCell({ league, team, slot, purchase, onRegister, onEdit }: { leagu
     }
   };
 
+  const otherCompatibleEmptySlots = purchase ? league.config.slots.filter((item) => item.id !== slot.id && allowedPositions(item).includes(purchase.position) && !league.purchases.some((other) => other.teamId === team.id && other.slotId === item.id)) : [];
+
   return (
     <div className="pick-cell">
       <PlayerInput value={jugador} onChange={(value) => { setJugador(value); commit(value, precio); }} options={options} id={`board-${team.id}-${slot.id}`} />
@@ -200,11 +203,17 @@ function BoardCell({ league, team, slot, purchase, onRegister, onEdit }: { leagu
         <input aria-label={`Precio de ${team.name}, ${slot.label}`} className="price-field" type="number" min="0" value={precio} onChange={(event) => { setPrecio(event.target.value); commit(jugador, event.target.value); }} placeholder="0" disabled={league.status !== "LIVE"} />
         {purchase && <em>{purchase.position}</em>}
       </div>
+      {purchase && otherCompatibleEmptySlots.length > 0 && (
+        <select className="move-select" aria-label={`Mover a ${purchase.playerName} a otro slot`} value={slot.id} disabled={league.status !== "LIVE"} onChange={(event) => { if (event.target.value !== slot.id) onMove(purchase.id, event.target.value); }}>
+          <option value={slot.id}>{slot.label}</option>
+          {otherCompatibleEmptySlots.map((item) => <option key={item.id} value={item.id}>→ {item.label}</option>)}
+        </select>
+      )}
     </div>
   );
 }
 
-function DraftTable({ league, onRegister, onEdit }: { league: League; onRegister: (playerName: string, teamId: string, price: number, slotId?: string) => boolean; onEdit: (purchaseId: string, patch: { teamId?: string; playerName?: string; price?: number }) => boolean }) {
+function DraftTable({ league, onRegister, onEdit, onMove }: { league: League; onRegister: (playerName: string, teamId: string, price: number, slotId?: string) => boolean; onEdit: (purchaseId: string, patch: { teamId?: string; playerName?: string; price?: number }) => boolean; onMove: (purchaseId: string, targetSlotId: string) => boolean }) {
   return (
     <div className="table-wrap board-wrap">
       <table className="draft-table">
@@ -213,7 +222,7 @@ function DraftTable({ league, onRegister, onEdit }: { league: League; onRegister
           {league.config.slots.map((slot) => (
             <tr key={slot.id}>
               <th className="sticky-col"><span className="slot-badge">{slot.label}</span></th>
-              {league.teams.map((team) => <td key={team.id}><BoardCell league={league} team={team} slot={slot} purchase={purchaseFor(league, team.id, slot.id)} onRegister={onRegister} onEdit={onEdit} /></td>)}
+              {league.teams.map((team) => <td key={team.id}><BoardCell league={league} team={team} slot={slot} purchase={purchaseFor(league, team.id, slot.id)} onRegister={onRegister} onEdit={onEdit} onMove={onMove} /></td>)}
             </tr>
           ))}
         </tbody>

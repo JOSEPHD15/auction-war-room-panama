@@ -14,7 +14,7 @@ export function createLeague(input: CreateLeagueInput): League {
   const now = Date.now();
   const roster = input.roster || DEFAULT_ROSTER;
   const teams: Team[] = defaultTeamNames(Math.min(16, Math.max(2, input.teamCount))).map((name) => ({ id: makeId("team"), name }));
-  const createdEvent: LeagueEvent = { id: makeId("event"), leagueId: id, type: "LEAGUE_CREATED", createdAt: now, updatedAt: now, operationId: makeId("op"), version: 1, payload: { name: input.name } };
+  const createdEvent: LeagueEvent = { id: makeId("event"), leagueId: id, type: "LEAGUE_CREATED", createdAt: now, updatedAt: now, updatedBy: null, operationId: makeId("op"), version: 1, payload: { name: input.name } };
   return {
     id,
     schemaVersion: SCHEMA_VERSION,
@@ -33,7 +33,7 @@ export function createLeague(input: CreateLeagueInput): League {
 export function duplicateLeague(source: League): League {
   const id = makeId("league");
   const now = Date.now();
-  const createdEvent: LeagueEvent = { id: makeId("event"), leagueId: id, type: "LEAGUE_CREATED", createdAt: now, updatedAt: now, operationId: makeId("op"), version: 1, payload: { duplicatedFrom: source.id } };
+  const createdEvent: LeagueEvent = { id: makeId("event"), leagueId: id, type: "LEAGUE_CREATED", createdAt: now, updatedAt: now, updatedBy: null, operationId: makeId("op"), version: 1, payload: { duplicatedFrom: source.id } };
   return {
     ...source,
     id,

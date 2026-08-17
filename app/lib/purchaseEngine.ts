@@ -13,8 +13,8 @@ function isOperationApplied(league: League, operationId: string): boolean {
   return league.eventLog.some((event) => event.operationId === operationId);
 }
 
-function pushEvent(league: League, event: Omit<LeagueEvent, "id" | "leagueId" | "version">): League {
-  const entry: LeagueEvent = { id: makeId("event"), leagueId: league.id, version: league.eventLog.length + 1, ...event };
+function pushEvent(league: League, event: Omit<LeagueEvent, "id" | "leagueId" | "version" | "updatedBy">): League {
+  const entry: LeagueEvent = { id: makeId("event"), leagueId: league.id, version: league.eventLog.length + 1, updatedBy: null, ...event };
   return { ...league, eventLog: [...league.eventLog, entry] };
 }
 
