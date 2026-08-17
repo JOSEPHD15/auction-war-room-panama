@@ -36,11 +36,16 @@ test("keeps spectator and manager mutations behind bearer authorization", async 
   assert.match(files[2], /returning/);
 });
 
-test("exports a true multi-sheet Excel workbook", async () => {
+test("exports a true multi-sheet, styled Excel workbook", async () => {
   const source = await readFile(new URL("../app/lib/exportExcel.ts", import.meta.url), "utf8");
-  for (const sheet of ["Resumen", "Equipos", "Rosters", "Compras", "Historial", "Configuración", "Agentes Libres"]) assert.match(source, new RegExp(`"${sheet}"`));
-  assert.match(source, /XLSX\.writeFile/);
+  for (const sheet of ["Resumen", "Draft Board", "Equipos", "Rosters", "Compras", "Historial", "Configuración", "Agentes Libres"]) assert.match(source, new RegExp(`"${sheet}"`));
+  // Migrated from the styling-less `xlsx` package to ExcelJS so real fills/fonts/borders/freeze panes/
+  // autofilter are possible — see the Excel export overhaul for the justification.
+  assert.match(source, /from "exceljs"/);
+  assert.match(source, /writeBuffer/);
+  assert.doesNotMatch(source, /from "xlsx"/);
   assert.match(source, /\^\[=\+\\-@\]/);
+  assert.doesNotMatch(source, /adminToken/);
 });
 
 test("allows preparing the first purchase before manually starting the draft", async () => {

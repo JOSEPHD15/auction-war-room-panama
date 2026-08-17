@@ -57,8 +57,9 @@ export default function LeagueLibrary() {
   const handleExportExcel = async (id: string) => {
     const league = loadLeague(id);
     if (!league) { setToast("No se pudo exportar la liga."); return; }
+    setToast("Generando Excel…");
     const { downloadLeagueExcel } = await import("../lib/exportExcel");
-    downloadLeagueExcel(league);
+    await downloadLeagueExcel(league);
     setToast("Excel exportado.");
   };
 

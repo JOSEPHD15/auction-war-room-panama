@@ -25,8 +25,9 @@ export default function LeagueAdminView({ leagueId }: { leagueId: string }) {
 
   const exportExcel = async () => {
     if (!league) return;
+    setToast("Generando Excel…");
     const { downloadLeagueExcel } = await import("../lib/exportExcel");
-    downloadLeagueExcel(league);
+    await downloadLeagueExcel(league);
     setToast("Excel exportado.");
   };
 

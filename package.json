@@ -9,7 +9,8 @@
     "dev": "node scripts/run-vinext.mjs dev",
     "build": "node scripts/run-vinext.mjs build",
     "start": "node scripts/run-vinext.mjs start",
-    "test": "npm run build && node --test tests/rendered-html.test.mjs",
+    "test": "npm run build && node --test tests/rendered-html.test.mjs && tsx --test tests/export-excel.test.mjs",
+    "test:excel": "tsx --test tests/export-excel.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
     "db:patch-config": "node scripts/patch-d1-binding.mjs",
@@ -17,10 +18,10 @@
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",
+    "exceljs": "^4.4.0",
     "qrcode": "^1.5.4",
     "react": "19.2.6",
-    "react-dom": "19.2.6",
-    "xlsx": "^0.18.5"
+    "react-dom": "19.2.6"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",
@@ -42,6 +43,7 @@
     "globals": "16.4.0",
     "react-server-dom-webpack": "19.2.6",
     "tailwindcss": "4.2.1",
+    "tsx": "^4.19.2",
     "typescript": "5.9.3",
     "typescript-eslint": "8.59.3",
     "vinext": "1.0.0-beta.2",
