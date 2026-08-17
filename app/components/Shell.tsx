@@ -22,6 +22,8 @@ export default function Shell({ headerCenter, headerRight, backHref, backLabel, 
   return (
     <main className={dark ? "app theme-dark" : "app theme-light"}>
       <header className="topbar public-topbar">
+        {/* A normal navigation avoids a vinext client-router failure seen in production. */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a href="/" className="brand" aria-label="Auction War Room — inicio">
           <span className="brand-mark brand-mark-image"><Image src="/draftlab-logo.jpeg" alt="" width={38} height={38} priority /></span>
           <span><b>DRAFT LAB</b><small>AUCTION WAR ROOM</small></span>

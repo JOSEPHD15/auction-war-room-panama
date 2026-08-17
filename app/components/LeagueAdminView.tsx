@@ -6,6 +6,7 @@ import { exportLeaguePayload } from "../lib/leagues";
 import { loadLeague, saveLeague } from "../lib/storage";
 import type { League } from "../lib/types";
 import DraftBoard from "./DraftBoard";
+import ShareLeagueButton from "./ShareLeagueButton";
 import Shell from "./Shell";
 
 export default function LeagueAdminView({ leagueId }: { leagueId: string }) {
@@ -57,6 +58,7 @@ export default function LeagueAdminView({ leagueId }: { leagueId: string }) {
       backHref="/mis-ligas"
       backLabel="← Mis ligas"
       headerRight={<>
+        <ShareLeagueButton league={league} onChange={handleChange} />
         <button className="save-button" onClick={exportExcel}>📊 Exportar Excel</button>
         <button className="ghost-button" onClick={exportJson}>Respaldo JSON</button>
       </>}
