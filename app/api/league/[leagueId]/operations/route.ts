@@ -1,11 +1,11 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getDb } from "../../../../../db";
 import { leagueLiveState } from "../../../../../db/schema";
 import { applyPurchase, editPurchase, movePurchase, undoLastPurchase } from "../../../../lib/purchaseEngine";
 import type { League } from "../../../../lib/types";
+import { authorizeLeague, unauthorized } from "../../../../lib/serverAuth";
 
 type OperationBody = {
-  managerToken?: string;
   operationId?: string;
   expectedVersion?: number;
   operation?:
@@ -39,13 +39,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ lea
     if (!row) return Response.json({ error: "El modo co-manager no está activo para esta liga." }, { status: 404 });
 
     const league = JSON.parse(row.payload) as League;
-
-    let updatedBy: string | null = "Admin";
-    if (body.managerToken) {
-      const manager = league.managers.find((item) => item.id === body.managerToken);
-      if (!manager) return Response.json({ error: "Enlace de co-manager inválido o revocado." }, { status: 403 });
-      updatedBy = manager.label;
-    }
+    const auth = await authorizeLeague(request, leagueId, row.adminTokenHash);
+    if (!auth.ok) return unauthorized();
+    const updatedBy = auth.label;
 
     if (row.writeVersion !== body.expectedVersion) {
       return Response.json({ error: "conflict", league, writeVersion: row.writeVersion }, { status: 409 });
@@ -67,10 +63,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ lea
     if (!result.ok) return Response.json({ error: result.error }, { status: 400 });
 
     const now = Date.now();
-    await db
+    const updatedRows = await db
       .update(leagueLiveState)
       .set({ payload: JSON.stringify(result.league), writeVersion: result.league.writeVersion, updatedAt: now })
-      .where(eq(leagueLiveState.leagueId, leagueId));
+      .where(and(eq(leagueLiveState.leagueId, leagueId), eq(leagueLiveState.writeVersion, body.expectedVersion)))
+      .returning({ writeVersion: leagueLiveState.writeVersion });
+
+    if (!updatedRows.length) {
+      const [fresh] = await db.select().from(leagueLiveState).where(eq(leagueLiveState.leagueId, leagueId)).limit(1);
+      if (!fresh) return Response.json({ error: "not_found" }, { status: 404 });
+      return Response.json({ error: "conflict", league: JSON.parse(fresh.payload), writeVersion: fresh.writeVersion }, { status: 409 });
+    }
 
     return Response.json({ ok: true, league: result.league, writeVersion: result.league.writeVersion });
   } catch (error) {

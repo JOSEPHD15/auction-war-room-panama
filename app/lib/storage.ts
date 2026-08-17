@@ -1,9 +1,9 @@
 import { buildSlots, DEFAULT_BUDGET, DEFAULT_MINIMUM_BID, DEFAULT_ROSTER, DEFAULT_SCORING } from "./formulas";
-import { makeId } from "./ids";
+import { makeAccessToken, makeId } from "./ids";
 import type { AppData, League, LeagueEvent, LeagueSummary, Position, Purchase } from "./types";
 
-export const SCHEMA_VERSION = 1;
-export const APP_VERSION = "2.0.0";
+export const SCHEMA_VERSION = 2;
+export const APP_VERSION = "3.0.0";
 
 const APP_KEY = "awr:app";
 const LEAGUE_PREFIX = "awr:league:";
@@ -20,9 +20,12 @@ function normalizeLeague(league: League): League {
   const needsScoring = typeof league.config.scoring !== "string";
   const needsSpectatorFields = typeof league.spectatorId === "undefined" || typeof league.spectatorPinEnabled === "undefined";
   const needsManagerFields = typeof league.managers === "undefined" || typeof league.writeVersion === "undefined";
-  if (!needsScoring && !needsSpectatorFields && !needsManagerFields) return league;
+  const needsAdminToken = typeof league.adminToken !== "string" || league.adminToken.length < 24;
+  if (!needsScoring && !needsSpectatorFields && !needsManagerFields && !needsAdminToken) return league;
   return {
     ...league,
+    schemaVersion: SCHEMA_VERSION,
+    adminToken: needsAdminToken ? makeAccessToken() : league.adminToken,
     config: needsScoring ? { ...league.config, scoring: DEFAULT_SCORING } : league.config,
     spectatorId: typeof league.spectatorId === "undefined" ? null : league.spectatorId,
     spectatorPinEnabled: typeof league.spectatorPinEnabled === "undefined" ? false : league.spectatorPinEnabled,
@@ -82,7 +85,7 @@ export function listLeagueSummaries(): LeagueSummary[] {
     try {
       const league = JSON.parse(localStorage.getItem(key) || "");
       if (!isValidLeagueShape(league)) continue;
-      summaries.push({ id: league.id, name: league.name, season: league.season, status: league.status, updatedAt: league.updatedAt, teams: league.teams.length });
+      summaries.push({ id: league.id, name: league.name, season: league.season, status: league.status, updatedAt: league.updatedAt, teams: league.teams.length, purchases: league.purchases.length, totalSlots: league.teams.length * league.config.slots.length });
     } catch {
       // skip corrupt entry, never throw
     }
@@ -141,6 +144,7 @@ function buildLeagueFromLegacy(legacy: LegacyData): League {
 
   return {
     id: leagueId,
+    adminToken: makeAccessToken(),
     schemaVersion: SCHEMA_VERSION,
     name: "Mi Liga",
     season: String(new Date(now).getFullYear()),

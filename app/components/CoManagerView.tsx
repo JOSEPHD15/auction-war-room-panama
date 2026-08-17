@@ -30,7 +30,7 @@ export default function CoManagerView({ token }: { token: string }) {
       if (resolved.status !== "ok") { setPhase("error"); return; }
       setLeagueId(resolved.leagueId);
       setLabel(resolved.label);
-      const state = await fetchLiveState(resolved.leagueId);
+      const state = await fetchLiveState(resolved.leagueId, token);
       if (state.status === "ok") { setLeague(state.league); setWriteVersion(state.writeVersion); setPhase("ready"); }
       else if (state.status === "not-found") setPhase("not-found");
       else setPhase("error");
@@ -41,7 +41,7 @@ export default function CoManagerView({ token }: { token: string }) {
     if (phase !== "ready" || !leagueId) return;
     let cancelled = false;
     const poll = async () => {
-      const state = await fetchLiveState(leagueId);
+      const state = await fetchLiveState(leagueId, token);
       if (!cancelled && state.status === "ok" && state.writeVersion !== writeVersion) { setLeague(state.league); setWriteVersion(state.writeVersion); }
       if (!cancelled) pollTimerRef.current = setTimeout(poll, document.visibilityState === "visible" ? 4000 : 20000);
     };
@@ -110,9 +110,9 @@ function CoManagerQuickPurchase({ league, onOperation, canAct }: { league: Leagu
     <article className="last-pick-hero">
       <div className="last-pick-label"><i /> REGISTRAR COMPRA</div>
       <div className="quick-purchase" style={{ marginTop: 18 }}>
-        <label>JUGADOR<PlayerCombobox value={player} onChange={setPlayer} league={league} players={PLAYERS} id="co-quick-player" disabled={!canAct || busy} /></label>
+        <label htmlFor="co-quick-player">JUGADOR<PlayerCombobox value={player} onChange={setPlayer} league={league} players={PLAYERS} id="co-quick-player" disabled={!canAct || busy} /></label>
         <label>EQUIPO<select value={teamId} onChange={(event) => setTeamId(event.target.value)}>{league.teams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}</select></label>
-        <label>PRECIO<div className="quick-price"><span>$</span><input type="number" min={league.config.minimumBid} value={price} onChange={(event) => setPrice(event.target.value)} placeholder="0" /></div></label>
+        <label htmlFor="co-quick-price">PRECIO<div className="quick-price"><span>$</span><input id="co-quick-price" type="number" min={league.config.minimumBid} value={price} onChange={(event) => setPrice(event.target.value)} placeholder="0" /></div></label>
         <button className="register-button" onClick={submit} disabled={!canAct || busy}>VENDIDO</button>
       </div>
     </article>
@@ -200,7 +200,7 @@ function CoManagerEditForm({ league, purchase, onOperation, onDone }: { league: 
   return (
     <div className="edit-purchase-form">
       <div className="field-grid">
-        <label className="form-field"><span>Jugador</span><PlayerCombobox value={playerName} onChange={setPlayerName} league={league} players={PLAYERS} id={`co-edit-${purchase.id}`} /></label>
+        <label className="form-field" htmlFor={`co-edit-${purchase.id}`}><span>Jugador</span><PlayerCombobox value={playerName} onChange={setPlayerName} league={league} players={PLAYERS} id={`co-edit-${purchase.id}`} /></label>
         <label className="form-field"><span>Equipo</span><select value={teamId} onChange={(event) => setTeamId(event.target.value)}>{league.teams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}</select></label>
         <label className="form-field"><span>Precio</span><input type="number" min="0" value={price} onChange={(event) => setPrice(event.target.value)} /></label>
       </div>

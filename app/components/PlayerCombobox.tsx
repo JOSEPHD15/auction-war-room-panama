@@ -32,7 +32,7 @@ export default function PlayerCombobox({ value, onChange, league, players, id, p
     return filtered.sort((a, b) => (a.taken ? 1 : 0) - (b.taken ? 1 : 0) || a.player.posicion.localeCompare(b.player.posicion) || a.rank - b.rank).slice(0, 40);
   }, [players, value, purchaseByKey]);
 
-  useEffect(() => setHighlight(0), [value, open]);
+  useEffect(() => { queueMicrotask(() => setHighlight(0)); }, [value, open]);
 
   useEffect(() => {
     function handleOutsideClick(event: MouseEvent) {

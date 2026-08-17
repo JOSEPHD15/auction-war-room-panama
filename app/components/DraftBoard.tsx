@@ -34,9 +34,7 @@ function Metric({ label, value, tone }: { label: string; value: string; tone?: s
 export default function DraftBoard({ league, onChange }: { league: League; onChange: (league: League) => void }) {
   const [configOpen, setConfigOpen] = useState(false);
   const [toast, setToast] = useState("");
-  const [soundEnabled, setSoundEnabled] = useState(true);
-
-  useEffect(() => { setSoundEnabled(getOrInitAppData().sound); }, []);
+  const [soundEnabled, setSoundEnabled] = useState(() => typeof window === "undefined" ? true : getOrInitAppData().sound);
 
   useEffect(() => {
     if (!toast) return;
@@ -176,9 +174,9 @@ function LastPurchase({ league, lastPurchase, onRegister, onUndo, canUndo }: { l
         <strong>{lastPurchase ? money(lastPurchase.price) : "$—"}</strong>
       </div>
       <div className="quick-purchase">
-        <label>JUGADOR<PlayerCombobox value={player} onChange={setPlayer} league={league} players={PLAYERS} id="quick-player-list" disabled={league.status !== "LIVE"} /></label>
+        <label htmlFor="quick-player-list">JUGADOR<PlayerCombobox value={player} onChange={setPlayer} league={league} players={PLAYERS} id="quick-player-list" disabled={league.status !== "LIVE"} /></label>
         <label>EQUIPO<select value={teamId} onChange={(event) => setTeamId(event.target.value)}>{league.teams.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-        <label>PRECIO<div className="quick-price"><span>$</span><input type="number" min={league.config.minimumBid} value={price} onChange={(event) => setPrice(event.target.value)} placeholder="0" onKeyDown={(event) => { if (event.key === "Enter" && player && team && price !== "") submit(); }} /></div></label>
+        <label htmlFor="quick-price">PRECIO<div className="quick-price"><span>$</span><input id="quick-price" type="number" min={league.config.minimumBid} value={price} onChange={(event) => setPrice(event.target.value)} placeholder="0" onKeyDown={(event) => { if (event.key === "Enter" && player && team && price !== "") submit(); }} /></div></label>
         <button className="register-button" onClick={submit} disabled={league.status !== "LIVE"}>VENDIDO</button>
         <button className="undo-button" disabled={!canUndo} onClick={onUndo}>↶ Deshacer</button>
       </div>
@@ -190,7 +188,12 @@ function BoardCell({ league, team, slot, purchase, onRegister, onEdit, onMove }:
   const [jugador, setJugador] = useState(purchase?.playerName || "");
   const [precio, setPrecio] = useState(purchase ? String(purchase.price) : "");
 
-  useEffect(() => { setJugador(purchase?.playerName || ""); setPrecio(purchase ? String(purchase.price) : ""); }, [purchase?.id, purchase?.playerName, purchase?.price]);
+  useEffect(() => {
+    queueMicrotask(() => {
+      setJugador(purchase?.playerName || "");
+      setPrecio(purchase ? String(purchase.price) : "");
+    });
+  }, [purchase]);
 
   const positionPlayers = PLAYERS.filter((item) => allowedPositions(slot).includes(item.posicion));
 
@@ -257,7 +260,7 @@ function AvailablePlayers({ league, drafted }: { league: League; drafted: Set<st
       <div className="available-panel">
         <div className="available-search"><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar jugador (ignora acentos)…" aria-label="Buscar jugadores disponibles" /><select value={position} onChange={(event) => setPosition(event.target.value as "TODOS" | Position)}><option value="TODOS">Todas las posiciones</option>{POSITIONS.map((item) => <option key={item}>{item}</option>)}</select></div>
         <div className={`rank-columns ${position !== "TODOS" ? "single-position" : ""}`}>
-          {visiblePositions.map((pos) => { const players = results.filter((player) => player.posicion === pos); return <div className="rank-column" key={pos}><div className="rank-column-head"><strong>{pos}</strong><span>{players.length} disponibles</span></div><div className="rank-column-list">{players.length ? players.map((player) => <div className={`ranked-player ${selected?.nombre === player.nombre ? "active" : ""}`} key={`${player.nombre}-${player.posicion}`} onClick={() => setSelected(player)}><em>#{player.rank}</em><b>{player.nombre}</b></div>) : <p>No hay jugadores disponibles.</p>}</div></div>; })}
+          {visiblePositions.map((pos) => { const players = results.filter((player) => player.posicion === pos); return <div className="rank-column" key={pos}><div className="rank-column-head"><strong>{pos}</strong><span>{players.length} disponibles</span></div><div className="rank-column-list">{players.length ? players.map((player) => <button type="button" className={`ranked-player ${selected?.nombre === player.nombre ? "active" : ""}`} key={`${player.nombre}-${player.posicion}`} onClick={() => setSelected(player)}><em>#{player.rank}</em><b>{player.nombre}</b></button>) : <p>No hay jugadores disponibles.</p>}</div></div>; })}
         </div>
         {selected && <CompetitiveIntel league={league} player={selected} onClose={() => setSelected(null)} />}
       </div>
@@ -332,7 +335,7 @@ function EditPurchaseForm({ league, purchase, onSave, onCancel }: { league: Leag
   return (
     <div className="edit-purchase-form">
       <div className="field-grid">
-        <label className="form-field"><span>Jugador</span><PlayerCombobox value={playerName} onChange={setPlayerName} league={league} players={PLAYERS} id={`edit-player-${purchase.id}`} /></label>
+        <label className="form-field" htmlFor={`edit-player-${purchase.id}`}><span>Jugador</span><PlayerCombobox value={playerName} onChange={setPlayerName} league={league} players={PLAYERS} id={`edit-player-${purchase.id}`} /></label>
         <label className="form-field"><span>Equipo</span><select value={teamId} onChange={(event) => setTeamId(event.target.value)}>{league.teams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}</select></label>
         <label className="form-field"><span>Precio</span><input type="number" min="0" value={price} onChange={(event) => setPrice(event.target.value)} /></label>
       </div>

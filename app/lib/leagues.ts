@@ -1,5 +1,5 @@
 import { buildSlots, DEFAULT_BUDGET, DEFAULT_MINIMUM_BID, DEFAULT_ROSTER, DEFAULT_SCORING } from "./formulas";
-import { makeId } from "./ids";
+import { makeAccessToken, makeId } from "./ids";
 import { APP_VERSION, SCHEMA_VERSION } from "./storage";
 import type { DraftStatus, League, LeagueEvent, Position, Purchase, RosterCounts, Slot, Team } from "./types";
 
@@ -17,6 +17,7 @@ export function createLeague(input: CreateLeagueInput): League {
   const createdEvent: LeagueEvent = { id: makeId("event"), leagueId: id, type: "LEAGUE_CREATED", createdAt: now, updatedAt: now, updatedBy: null, operationId: makeId("op"), version: 1, payload: { name: input.name } };
   return {
     id,
+    adminToken: makeAccessToken(),
     schemaVersion: SCHEMA_VERSION,
     name: input.name.trim() || "Nueva Liga",
     season: input.season.trim() || String(new Date(now).getFullYear()),
@@ -41,6 +42,7 @@ export function duplicateLeague(source: League): League {
   return {
     ...source,
     id,
+    adminToken: makeAccessToken(),
     name: `${source.name} (copia)`,
     createdAt: now,
     updatedAt: now,
@@ -59,7 +61,7 @@ export function duplicateLeague(source: League): League {
 
 export function withFreshId(league: League): League {
   // Reset spectator sharing and co-manager access too: an imported copy must never collide on those links.
-  return { ...league, id: makeId("league"), name: `${league.name} (copia)`, spectatorId: null, spectatorPinEnabled: false, managers: [], writeVersion: 1 };
+  return { ...league, id: makeId("league"), adminToken: makeAccessToken(), name: `${league.name} (copia)`, spectatorId: null, spectatorPinEnabled: false, managers: [], writeVersion: 1 };
 }
 
 export type LeagueBackupFile = { schemaVersion: number; appVersion: string; exportedAt: number; league: League };
@@ -115,6 +117,7 @@ export function validateLeague(value: unknown): { ok: true; league: League } | {
   if (!value || typeof value !== "object") return { ok: false, error: "El archivo no contiene una liga válida." };
   const league = value as League;
   if (typeof league.id !== "string" || !league.id) return { ok: false, error: "Falta el ID de la liga." };
+  if (typeof league.adminToken !== "string" || league.adminToken.length < 24) league.adminToken = makeAccessToken();
   if (typeof league.name !== "string" || !league.name.trim()) return { ok: false, error: "Falta el nombre de la liga." };
   if (!VALID_STATUSES.includes(league.status)) return { ok: false, error: "Estado de draft inválido." };
   if (!league.config || typeof league.config.budget !== "number" || typeof league.config.minimumBid !== "number" || typeof league.config.scoring !== "string") return { ok: false, error: "Configuración de liga inválida." };

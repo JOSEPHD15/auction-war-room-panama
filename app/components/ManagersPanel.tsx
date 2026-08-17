@@ -19,7 +19,7 @@ export default function ManagersPanel({ league, onChange }: { league: League; on
     if (result.status === "ok") return { ok: true, league: attempt };
     if (result.status === "error") return { ok: false };
     // Conflict: someone else's write landed first — reapply our intended change on top of the fresh state and try once more.
-    const fresh = await fetchLiveState(league.id);
+    const fresh = await fetchLiveState(league.id, league.adminToken, true);
     if (fresh.status !== "ok") return { ok: false };
     const retryAttempt = mutate(fresh.league);
     const retryResult = await publishLiveState(retryAttempt, fresh.writeVersion);
@@ -32,7 +32,7 @@ export default function ManagersPanel({ league, onChange }: { league: League; on
     const { league: withManager, manager } = addManager(league, label);
     const published = await publishWithRetry(() => withManager);
     if (!published.ok || !published.league) { setError("No se pudo activar el enlace — revisa tu conexión e intenta de nuevo."); setBusy(false); return; }
-    await registerManagerToken(league.id, manager.id, manager.label);
+    await registerManagerToken(league.id, manager.id, manager.label, league.adminToken);
     onChange(published.league);
     setLabel("");
     setBusy(false);
@@ -44,7 +44,7 @@ export default function ManagersPanel({ league, onChange }: { league: League; on
     setError("");
     const published = await publishWithRetry((base) => removeManager(base, managerId));
     if (!published.ok || !published.league) { setError("No se pudo revocar — revisa tu conexión e intenta de nuevo."); setBusy(false); return; }
-    await revokeManagerToken(league.id, managerId);
+    await revokeManagerToken(league.id, managerId, league.adminToken);
     onChange(published.league);
     setBusy(false);
   };

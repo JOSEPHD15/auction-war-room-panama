@@ -9,6 +9,7 @@ export const spectatorSnapshots = sqliteTable("spectator_snapshots", {
   spectatorId: text("spectator_id").primaryKey(),
   leagueId: text("league_id").notNull(),
   payload: text("payload").notNull(),
+  adminTokenHash: text("admin_token_hash").notNull().default(""),
   pinHash: text("pin_hash"),
   updatedAt: integer("updated_at").notNull(),
 });
@@ -22,6 +23,7 @@ export const spectatorSnapshots = sqliteTable("spectator_snapshots", {
 export const leagueLiveState = sqliteTable("league_live_state", {
   leagueId: text("league_id").primaryKey(),
   payload: text("payload").notNull(),
+  adminTokenHash: text("admin_token_hash").notNull().default(""),
   writeVersion: integer("write_version").notNull(),
   updatedAt: integer("updated_at").notNull(),
 });

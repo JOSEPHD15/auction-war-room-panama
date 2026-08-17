@@ -13,7 +13,7 @@ export default function LeagueAdminView({ leagueId }: { leagueId: string }) {
   const [league, setLeague] = useState<League | null | undefined>(undefined);
   const [toast, setToast] = useState("");
 
-  useEffect(() => { setLeague(loadLeague(leagueId)); }, [leagueId]);
+  useEffect(() => { queueMicrotask(() => setLeague(loadLeague(leagueId))); }, [leagueId]);
 
   useEffect(() => {
     if (!toast) return;
@@ -45,7 +45,7 @@ export default function LeagueAdminView({ leagueId }: { leagueId: string }) {
           <div className="empty-state">
             <b>No se encontró esta liga en este dispositivo</b>
             <span>El enlace puede pertenecer a otro navegador o la liga fue eliminada.</span>
-            <p><Link className="save-button" href="/mis-ligas">Ir a Mis ligas</Link></p>
+            <p><Link prefetch={false} className="save-button" href="/mis-ligas">Ir a Mis ligas</Link></p>
           </div>
         </section>
       </Shell>

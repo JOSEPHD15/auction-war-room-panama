@@ -11,6 +11,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "types": ["@cloudflare/workers-types"],
     "jsx": "react-jsx",
     "incremental": true,
     "paths": {
@@ -25,5 +26,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist", "work"]
 }

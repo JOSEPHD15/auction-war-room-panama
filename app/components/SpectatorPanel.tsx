@@ -28,7 +28,7 @@ export default function SpectatorPanel({ league, onChange }: { league: League; o
   useEffect(() => {
     if (retryTimerRef.current) { clearTimeout(retryTimerRef.current); retryTimerRef.current = null; }
     if (!league.spectatorId) return;
-    if (!needsSync(league.id, league.updatedAt)) { setSyncStatus("synced"); return; }
+    if (!needsSync(league.id, league.updatedAt)) { queueMicrotask(() => setSyncStatus("synced")); return; }
 
     let cancelled = false;
     const attempt = async (attemptNumber: number) => {
@@ -60,7 +60,7 @@ export default function SpectatorPanel({ league, onChange }: { league: League; o
 
   const deactivate = async () => {
     if (!confirm("¿Desactivar el modo espectador? El enlace actual dejará de funcionar.")) return;
-    if (league.spectatorId) { await disableSpectatorSnapshot(league.spectatorId); clearQueueEntry(league.id); }
+    if (league.spectatorId) { await disableSpectatorSnapshot(league.spectatorId, league.adminToken); clearQueueEntry(league.id); }
     onChange({ ...league, spectatorId: null, spectatorPinEnabled: false });
   };
 
@@ -72,7 +72,7 @@ export default function SpectatorPanel({ league, onChange }: { league: League; o
     clearQueueEntry(league.id);
     onChange({ ...league, spectatorId: makeSpectatorId(), spectatorPinEnabled: false });
     // The next render's effect publishes the new snapshot; we just need to drop the old row.
-    setTimeout(() => disableSpectatorSnapshot(previousSpectatorId), 1500);
+    setTimeout(() => disableSpectatorSnapshot(previousSpectatorId, league.adminToken), 1500);
   };
 
   const savePin = async () => {
@@ -113,6 +113,8 @@ export default function SpectatorPanel({ league, onChange }: { league: League; o
             <button className="ghost-button" onClick={toggleQr}>{showQr ? "Ocultar QR" : "Mostrar QR"}</button>
             <button className="ghost-button" onClick={regenerate}>Regenerar link</button>
           </div>
+          {/* Generated data URL: next/image cannot optimize this transient client-side asset. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           {showQr && qrDataUrl && <img className="spectator-qr" src={qrDataUrl} alt="Código QR del enlace de espectador" />}
           <div className="spectator-pin-row">
             <input type="text" inputMode="numeric" maxLength={8} placeholder={league.spectatorPinEnabled ? "PIN activo · escribe uno nuevo o deja vacío para quitarlo" : "PIN opcional (vacío = sin PIN)"} value={pinInput} onChange={(event) => setPinInput(event.target.value)} />

@@ -51,6 +51,8 @@ export type ManagerAccess = { id: string; role: ManagerRole; label: string; crea
 
 export type League = {
   id: string;
+  /** Device-local administrator credential. Sent only as a bearer token to protected API routes. */
+  adminToken: string;
   schemaVersion: number;
   name: string;
   season: string;
@@ -87,4 +89,4 @@ export type AppData = {
 export type PurchaseInput = { teamId: string; playerName: string; price: number; slotId?: string };
 export type EngineResult<T> = { ok: true; league: League; result: T } | { ok: false; error: string };
 
-export type LeagueSummary = { id: string; name: string; season: string; status: DraftStatus; updatedAt: number; teams: number };
+export type LeagueSummary = { id: string; name: string; season: string; status: DraftStatus; updatedAt: number; teams: number; purchases: number; totalSlots: number };

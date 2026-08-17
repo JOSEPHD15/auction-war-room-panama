@@ -28,7 +28,7 @@ export default function LeagueLibrary() {
   const importRef = useRef<HTMLInputElement>(null);
 
   const refresh = () => setLeagues(listLeagueSummaries());
-  useEffect(refresh, []);
+  useEffect(() => { queueMicrotask(refresh); }, []);
 
   useEffect(() => {
     if (!toast) return;
@@ -50,8 +50,8 @@ export default function LeagueLibrary() {
     deleteLeague(id);
     refresh();
     setToast("Liga eliminada.");
-    if (league?.spectatorId) await disableSpectatorSnapshot(league.spectatorId);
-    if (league?.managers.length) await Promise.all(league.managers.map((manager) => revokeManagerToken(league.id, manager.id)));
+    if (league?.spectatorId) await disableSpectatorSnapshot(league.spectatorId, league.adminToken);
+    if (league?.managers.length) await Promise.all(league.managers.map((manager) => revokeManagerToken(league.id, manager.id, league.adminToken)));
   };
 
   const handleExportExcel = async (id: string) => {
@@ -107,14 +107,14 @@ export default function LeagueLibrary() {
   };
 
   return (
-    <section className="page-shell">
+    <section className="page-shell library-shell">
       <div className="page-intro">
-        <div><span className="eyebrow">Biblioteca local</span><h1>Mis ligas</h1><p>Ligas guardadas en este dispositivo. Solo tú puedes verlas — no aparecen en ningún directorio público.</p></div>
+        <div><span className="eyebrow">Tu centro de control</span><h1>Mis ligas</h1><p>Cada war room vive únicamente en este dispositivo y permanece aislado de las demás.</p></div>
         <div className="intro-actions">
-          <button className="ghost-button" onClick={handleExportAll} disabled={!leagues.length}>Exportar todas</button>
-          <button className="ghost-button" onClick={() => importRef.current?.click()}>Importar</button>
+          <button className="ghost-button" onClick={handleExportAll} disabled={!leagues.length}>Respaldo completo</button>
+          <button className="ghost-button" onClick={() => importRef.current?.click()}>Importar JSON</button>
           <input ref={importRef} className="sr-only" type="file" accept="application/json" onChange={handleImportInput} />
-          <button className="save-button" onClick={() => setCreating((value) => !value)}>{creating ? "Cancelar" : "+ Nueva liga"}</button>
+          <button className="save-button primary-cta" onClick={() => setCreating((value) => !value)}>{creating ? "Cancelar" : "+ Nueva liga"}</button>
         </div>
       </div>
 
@@ -124,27 +124,31 @@ export default function LeagueLibrary() {
         <div className="league-grid">
           {leagues.map((league) => (
             <article className="team-card league-card" key={league.id}>
+              <div className="league-card-accent" />
               <div className="team-card-head">
                 {renamingId === league.id ? (
-                  <input className="rename-input" autoFocus value={renameValue} onChange={(event) => setRenameValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") confirmRename(league.id); if (event.key === "Escape") setRenamingId(null); }} onBlur={() => confirmRename(league.id)} />
+                  <input className="rename-input" value={renameValue} aria-label="Nuevo nombre de la liga" onChange={(event) => setRenameValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") confirmRename(league.id); if (event.key === "Escape") setRenamingId(null); }} onBlur={() => confirmRename(league.id)} />
                 ) : <h3>{league.name}</h3>}
                 <span className={`status-pill ${STATUS_CLASS[league.status]}`}>{STATUS_LABEL[league.status]}</span>
               </div>
-              <div className="stat-line"><span>Temporada <b>{league.season}</b></span><span>Equipos <b>{league.teams}</b></span></div>
-              <p className="league-meta">Modificada {formatDate(league.updatedAt)}</p>
+              <div className="league-card-stats"><span><small>Temporada</small><b>{league.season}</b></span><span><small>Equipos</small><b>{league.teams}</b></span><span><small>Compras</small><b>{league.purchases}</b></span></div>
+              <div className="league-progress"><div style={{ width: `${league.totalSlots ? Math.min(100, league.purchases / league.totalSlots * 100) : 0}%` }} /></div>
+              <p className="league-meta">{league.purchases} de {league.totalSlots} slots · Editada {formatDate(league.updatedAt)}</p>
               <div className="league-actions">
-                <button className="save-button" onClick={() => router.push(`/liga/${league.id}`)}>Abrir</button>
-                <button className="ghost-button" onClick={() => startRename(league)}>Renombrar</button>
-                <button className="ghost-button" onClick={() => handleDuplicate(league.id)}>Duplicar</button>
-                <button className="ghost-button" onClick={() => handleExportExcel(league.id)}>📊 Excel</button>
-                <button className="ghost-button" onClick={() => handleExportJson(league.id, league.name)}>JSON</button>
-                <button className="danger-button" onClick={() => handleDelete(league.id, league.name)}>Eliminar</button>
+                <button className="save-button league-open" onClick={() => router.push(`/liga/${league.id}`)}>Entrar al draft <span>→</span></button>
+                <details className="league-menu"><summary aria-label={`Más opciones para ${league.name}`}>•••</summary><div>
+                  <button onClick={() => startRename(league)}>Renombrar</button>
+                  <button onClick={() => handleDuplicate(league.id)}>Duplicar</button>
+                  <button onClick={() => handleExportExcel(league.id)}>Exportar Excel</button>
+                  <button onClick={() => handleExportJson(league.id, league.name)}>Respaldo JSON</button>
+                  <button className="menu-danger" onClick={() => handleDelete(league.id, league.name)}>Eliminar liga</button>
+                </div></details>
               </div>
             </article>
           ))}
         </div>
       ) : !creating ? (
-        <div className="empty-state"><b>Todavía no tienes ligas guardadas</b><span>Crea tu primera liga para empezar el draft.</span></div>
+        <div className="empty-state library-empty"><span className="empty-icon">＋</span><b>Tu primera war room empieza aquí</b><span>Crea una liga y tendrás el tablero listo en menos de un minuto.</span><button className="save-button primary-cta" onClick={() => setCreating(true)}>Crear liga</button></div>
       ) : null}
 
       {toast && <div className="toast" role="status">{toast}</div>}

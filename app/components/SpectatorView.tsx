@@ -37,7 +37,7 @@ export default function SpectatorView({ spectatorId }: { spectatorId: string }) 
     return false;
   };
 
-  useEffect(() => { load(); }, [spectatorId]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { queueMicrotask(() => { void load(); }); }, [spectatorId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (phase !== "ready") return;
@@ -90,7 +90,7 @@ export default function SpectatorView({ spectatorId }: { spectatorId: string }) 
         <section className="page-shell">
           <form className="league-settings spectator-pin-gate" onSubmit={submitPin}>
             <div className="settings-head"><div><span className="eyebrow">Acceso protegido</span><h2>Esta liga pide un PIN para ver el draft</h2></div></div>
-            <label className="form-field"><span>PIN</span><input autoFocus type="text" inputMode="numeric" value={pin} onChange={(event) => setPin(event.target.value)} /></label>
+            <label className="form-field"><span>PIN</span><input type="text" inputMode="numeric" value={pin} onChange={(event) => setPin(event.target.value)} /></label>
             {phase === "invalid-pin" && <p className="spectator-error">PIN incorrecto.</p>}
             <div className="settings-actions"><button className="save-button" type="submit">Entrar</button></div>
           </form>

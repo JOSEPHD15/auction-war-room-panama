@@ -1,5 +1,7 @@
 import { getDb } from "../../../../../db";
-import { managerAccessTokens } from "../../../../../db/schema";
+import { leagueLiveState, managerAccessTokens } from "../../../../../db/schema";
+import { eq } from "drizzle-orm";
+import { authorizeLeague, unauthorized } from "../../../../lib/serverAuth";
 
 type RegisterBody = { token?: string; label?: string };
 
@@ -11,6 +13,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ lea
     if (!body.token || !body.label) return Response.json({ error: "token y label son obligatorios." }, { status: 400 });
 
     const db = getDb();
+    const [state] = await db.select().from(leagueLiveState).where(eq(leagueLiveState.leagueId, leagueId)).limit(1);
+    if (!state) return Response.json({ error: "Activa primero la colaboración para esta liga." }, { status: 404 });
+    const auth = await authorizeLeague(request, leagueId, state.adminTokenHash);
+    if (!auth.ok || auth.role !== "admin") return unauthorized();
     await db.insert(managerAccessTokens).values({ token: body.token, leagueId, label: body.label, createdAt: Date.now() });
     return Response.json({ ok: true });
   } catch (error) {

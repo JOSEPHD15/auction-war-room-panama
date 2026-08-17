@@ -2,13 +2,17 @@ import type { League } from "./types";
 
 export type LiveStateResult = { status: "ok"; league: League; writeVersion: number } | { status: "not-found" } | { status: "error"; error: string };
 
-export async function fetchLiveState(leagueId: string): Promise<LiveStateResult> {
+function withoutAdminSecret(league: League): League {
+  return { ...league, adminToken: "" };
+}
+
+export async function fetchLiveState(leagueId: string, accessToken: string, restoreAdminToken = false): Promise<LiveStateResult> {
   try {
-    const response = await fetch(`/api/league/${leagueId}/state`, { cache: "no-store" });
+    const response = await fetch(`/api/league/${leagueId}/state`, { cache: "no-store", headers: { Authorization: `Bearer ${accessToken}` } });
     if (response.status === 404) return { status: "not-found" };
     const data = (await response.json()) as { league?: League; writeVersion?: number; error?: string };
     if (!response.ok || !data.league || typeof data.writeVersion !== "number") return { status: "error", error: data.error || `Error ${response.status}` };
-    return { status: "ok", league: data.league, writeVersion: data.writeVersion };
+    return { status: "ok", league: { ...data.league, adminToken: restoreAdminToken ? accessToken : "" }, writeVersion: data.writeVersion };
   } catch {
     return { status: "error", error: "Sin conexión." };
   }
@@ -18,9 +22,9 @@ export type PublishStateResult = { status: "ok"; writeVersion: number } | { stat
 
 export async function publishLiveState(league: League, expectedVersion: number): Promise<PublishStateResult> {
   try {
-    const response = await fetch(`/api/league/${league.id}/state`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ league, expectedVersion }) });
+    const response = await fetch(`/api/league/${league.id}/state`, { method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${league.adminToken}` }, body: JSON.stringify({ league: withoutAdminSecret(league), expectedVersion }) });
     const data = (await response.json()) as { ok?: boolean; writeVersion?: number; league?: League; error?: string };
-    if (response.status === 409 && data.league && typeof data.writeVersion === "number") return { status: "conflict", league: data.league, writeVersion: data.writeVersion };
+    if (response.status === 409 && data.league && typeof data.writeVersion === "number") return { status: "conflict", league: { ...data.league, adminToken: league.adminToken }, writeVersion: data.writeVersion };
     if (!response.ok || typeof data.writeVersion !== "number") return { status: "error", error: data.error || `Error ${response.status}` };
     return { status: "ok", writeVersion: data.writeVersion };
   } catch {
@@ -36,9 +40,9 @@ export type RemoteOperation =
 
 export type OperationResult = { status: "ok"; league: League; writeVersion: number } | { status: "conflict"; league: League; writeVersion: number } | { status: "rejected"; error: string } | { status: "error"; error: string };
 
-export async function applyRemoteOperation(leagueId: string, operation: RemoteOperation, operationId: string, expectedVersion: number, managerToken?: string): Promise<OperationResult> {
+export async function applyRemoteOperation(leagueId: string, operation: RemoteOperation, operationId: string, expectedVersion: number, accessToken: string): Promise<OperationResult> {
   try {
-    const response = await fetch(`/api/league/${leagueId}/operations`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ managerToken, operation, operationId, expectedVersion }) });
+    const response = await fetch(`/api/league/${leagueId}/operations`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` }, body: JSON.stringify({ operation, operationId, expectedVersion }) });
     const data = (await response.json()) as { ok?: boolean; league?: League; writeVersion?: number; error?: string };
     if (response.status === 409 && data.league && typeof data.writeVersion === "number") return { status: "conflict", league: data.league, writeVersion: data.writeVersion };
     if (response.status === 400) return { status: "rejected", error: data.error || "Operación inválida." };
@@ -49,17 +53,17 @@ export async function applyRemoteOperation(leagueId: string, operation: RemoteOp
   }
 }
 
-export async function registerManagerToken(leagueId: string, token: string, label: string): Promise<void> {
+export async function registerManagerToken(leagueId: string, token: string, label: string, adminToken: string): Promise<void> {
   try {
-    await fetch(`/api/league/${leagueId}/managers`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, label }) });
+    await fetch(`/api/league/${leagueId}/managers`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${adminToken}` }, body: JSON.stringify({ token, label }) });
   } catch {
     // best effort — if this fails the link just won't resolve yet; the admin can retry by re-publishing
   }
 }
 
-export async function revokeManagerToken(leagueId: string, managerId: string): Promise<void> {
+export async function revokeManagerToken(leagueId: string, managerId: string, adminToken: string): Promise<void> {
   try {
-    await fetch(`/api/league/${leagueId}/managers/${managerId}`, { method: "DELETE" });
+    await fetch(`/api/league/${leagueId}/managers/${managerId}`, { method: "DELETE", headers: { Authorization: `Bearer ${adminToken}` } });
   } catch {
     // best effort
   }

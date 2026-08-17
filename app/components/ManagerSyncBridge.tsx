@@ -42,7 +42,7 @@ export default function ManagerSyncBridge({ league, onChange, onConflict }: { le
     let cancelled = false;
 
     const poll = async () => {
-      const result = await fetchLiveState(league.id);
+      const result = await fetchLiveState(league.id, league.adminToken, true);
       if (!cancelled && result.status === "ok" && result.writeVersion > lastKnownRemoteVersionRef.current) {
         lastKnownRemoteVersionRef.current = result.writeVersion;
         onChange(result.league);
@@ -55,7 +55,7 @@ export default function ManagerSyncBridge({ league, onChange, onConflict }: { le
     poll();
     return () => { cancelled = true; if (pollTimerRef.current) clearTimeout(pollTimerRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [league.id, league.managers.length]);
+  }, [league.id, league.adminToken, league.managers.length]);
 
   return null;
 }

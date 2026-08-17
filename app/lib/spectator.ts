@@ -3,10 +3,10 @@ import type { League } from "./types";
 export async function publishSpectatorSnapshot(league: League, options: { pin?: string | null; previousSpectatorId?: string | null } = {}): Promise<{ ok: boolean; error?: string }> {
   if (!league.spectatorId) return { ok: false, error: "Esta liga no tiene modo espectador activado." };
   try {
-    const body: Record<string, unknown> = { spectatorId: league.spectatorId, leagueId: league.id, league };
+    const body: Record<string, unknown> = { spectatorId: league.spectatorId, leagueId: league.id, league: { ...league, adminToken: "" } };
     if ("pin" in options) body.pin = options.pin ?? null;
     if (options.previousSpectatorId) body.previousSpectatorId = options.previousSpectatorId;
-    const response = await fetch("/api/spectator", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const response = await fetch("/api/spectator", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${league.adminToken}` }, body: JSON.stringify(body) });
     if (!response.ok) {
       const data = (await response.json().catch(() => ({}))) as { error?: string };
       return { ok: false, error: data.error || `Error ${response.status}` };
@@ -17,9 +17,9 @@ export async function publishSpectatorSnapshot(league: League, options: { pin?: 
   }
 }
 
-export async function disableSpectatorSnapshot(spectatorId: string): Promise<void> {
+export async function disableSpectatorSnapshot(spectatorId: string, adminToken: string): Promise<void> {
   try {
-    await fetch(`/api/spectator/${spectatorId}`, { method: "DELETE" });
+    await fetch(`/api/spectator/${spectatorId}`, { method: "DELETE", headers: { Authorization: `Bearer ${adminToken}` } });
   } catch {
     // best effort — the row will simply go stale if this fails
   }

@@ -21,18 +21,18 @@ export default function CreateLeagueForm({ title }: { title?: string }) {
   };
 
   return (
-    <div className="league-settings">
-      <div className="settings-head"><div><span className="eyebrow">Configuración rápida</span><h2>{title || "Crear liga"}</h2></div></div>
-      <div className="field-grid">
-        <label className="form-field"><span>Nombre</span><input value={name} onChange={(event) => setName(event.target.value)} placeholder="Liga Panamá 2026" /></label>
+    <div className="league-settings create-league-card">
+      <div className="settings-head"><div><span className="eyebrow">Nueva liga</span><h2>{title || "Crear liga"}</h2><p>Lista en menos de un minuto.</p></div><span className="setup-badge">Setup rápido</span></div>
+      <div className="field-grid create-field-grid">
+        <label className="form-field field-wide"><span>Nombre de la liga</span><input autoComplete="off" value={name} onChange={(event) => setName(event.target.value)} placeholder="Ej. Liga de los domingos" /></label>
         <label className="form-field"><span>Temporada</span><input value={season} onChange={(event) => setSeason(event.target.value)} /></label>
         <label className="form-field"><span>Equipos</span><input type="number" min="2" max="16" value={teamCount} onChange={(event) => setTeamCount(Math.min(16, Math.max(2, Number(event.target.value) || 2)))} /></label>
         <label className="form-field"><span>Presupuesto</span><input type="number" min="1" value={budget} onChange={(event) => setBudget(Math.max(1, Number(event.target.value) || 1))} /></label>
         <label className="form-field"><span>Puja mínima</span><input type="number" min="0" value={minimumBid} onChange={(event) => setMinimumBid(Math.max(0, Number(event.target.value) || 0))} /></label>
         <label className="form-field"><span>Puntuación</span><input value={scoring} onChange={(event) => setScoring(event.target.value)} list="scoring-presets" /><datalist id="scoring-presets">{SCORING_PRESETS.map((preset) => <option key={preset} value={preset} />)}</datalist></label>
       </div>
-      <div className="settings-actions"><button className="save-button" onClick={submit}>Crear liga</button></div>
-      <p className="form-note">Podrás ajustar equipos, presupuesto, puja mínima y roster antes de iniciar el draft. Esta configuración no es obligatoria.</p>
+      <div className="preset-summary"><span>Roster inicial</span><b>QB · 2 RB · 2 WR · TE · FLEX · K · DEF · 5 Banca</b></div>
+      <div className="settings-actions create-actions"><p className="form-note">Podrás editar todo antes de iniciar.</p><button className="save-button primary-cta" onClick={submit}>Crear mi liga <span>→</span></button></div>
     </div>
   );
 }

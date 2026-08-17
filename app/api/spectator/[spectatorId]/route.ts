@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "../../../../db";
 import { spectatorSnapshots } from "../../../../db/schema";
 import { hashPin } from "../../../lib/pin";
+import { bearerToken, secretsMatch, unauthorized } from "../../../lib/serverAuth";
 
 function errorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : "Unexpected error";
@@ -31,10 +32,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ spec
 }
 
 /** Used when the admin disables spectator mode entirely (not for routine regeneration — that's handled by POST's previousSpectatorId cleanup). */
-export async function DELETE(_request: Request, { params }: { params: Promise<{ spectatorId: string }> }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ spectatorId: string }> }) {
   try {
     const { spectatorId } = await params;
     const db = getDb();
+    const [row] = await db.select().from(spectatorSnapshots).where(eq(spectatorSnapshots.spectatorId, spectatorId)).limit(1);
+    if (!row) return Response.json({ ok: true });
+    const token = bearerToken(request);
+    if (!token || !row.adminTokenHash || !(await secretsMatch(token, row.adminTokenHash))) return unauthorized();
     await db.delete(spectatorSnapshots).where(eq(spectatorSnapshots.spectatorId, spectatorId));
     return Response.json({ ok: true });
   } catch (error) {
