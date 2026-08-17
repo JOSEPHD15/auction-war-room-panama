@@ -5,6 +5,7 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { renameLeague } from "../lib/draftStatus";
 import { downloadJSON } from "../lib/download";
 import { duplicateLeague, exportAllLeaguesPayload, exportLeaguePayload, parseImportFile, withFreshId } from "../lib/leagues";
+import { revokeManagerToken } from "../lib/liveState";
 import { disableSpectatorSnapshot } from "../lib/spectator";
 import { deleteLeague, listLeagueSummaries, loadLeague, saveLeague } from "../lib/storage";
 import type { LeagueSummary } from "../lib/types";
@@ -50,6 +51,7 @@ export default function LeagueLibrary() {
     refresh();
     setToast("Liga eliminada.");
     if (league?.spectatorId) await disableSpectatorSnapshot(league.spectatorId);
+    if (league?.managers.length) await Promise.all(league.managers.map((manager) => revokeManagerToken(league.id, manager.id)));
   };
 
   const handleExportExcel = async (id: string) => {

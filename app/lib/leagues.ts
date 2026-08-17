@@ -29,6 +29,8 @@ export function createLeague(input: CreateLeagueInput): League {
     eventLog: [createdEvent],
     spectatorId: null,
     spectatorPinEnabled: false,
+    managers: [],
+    writeVersion: 1,
   };
 }
 
@@ -46,15 +48,18 @@ export function duplicateLeague(source: League): League {
     teams: source.teams.map((team) => ({ ...team })),
     purchases: [],
     eventLog: [createdEvent],
-    // A duplicate never inherits the source league's spectator link — spectatorId must stay globally unique.
+    // A duplicate never inherits the source league's spectator link or co-manager access — those ids
+    // must stay unique to the league they were issued for.
     spectatorId: null,
     spectatorPinEnabled: false,
+    managers: [],
+    writeVersion: 1,
   };
 }
 
 export function withFreshId(league: League): League {
-  // Reset spectator sharing too: an imported copy must never collide with the original's spectatorId.
-  return { ...league, id: makeId("league"), name: `${league.name} (copia)`, spectatorId: null, spectatorPinEnabled: false };
+  // Reset spectator sharing and co-manager access too: an imported copy must never collide on those links.
+  return { ...league, id: makeId("league"), name: `${league.name} (copia)`, spectatorId: null, spectatorPinEnabled: false, managers: [], writeVersion: 1 };
 }
 
 export type LeagueBackupFile = { schemaVersion: number; appVersion: string; exportedAt: number; league: League };

@@ -13,9 +13,11 @@ function isOperationApplied(league: League, operationId: string): boolean {
   return league.eventLog.some((event) => event.operationId === operationId);
 }
 
-function pushEvent(league: League, event: Omit<LeagueEvent, "id" | "leagueId" | "version" | "updatedBy">): League {
-  const entry: LeagueEvent = { id: makeId("event"), leagueId: league.id, version: league.eventLog.length + 1, updatedBy: null, ...event };
-  return { ...league, eventLog: [...league.eventLog, entry] };
+function pushEvent(league: League, event: Omit<LeagueEvent, "id" | "leagueId" | "version" | "updatedBy">, updatedBy: string | null = null): League {
+  const entry: LeagueEvent = { id: makeId("event"), leagueId: league.id, version: league.eventLog.length + 1, updatedBy, ...event };
+  // writeVersion is the optimistic-concurrency counter co-manager writes are checked against — every
+  // purchase-mutating operation goes through this one function, so bumping it here covers all of them.
+  return { ...league, eventLog: [...league.eventLog, entry], writeVersion: league.writeVersion + 1 };
 }
 
 function pickSlotForPosition(league: League, teamId: string, position: Player["posicion"], excludePurchaseId?: string): Slot | null {
@@ -36,8 +38,8 @@ function isPlayerTaken(league: League, playerName: string, excludePurchaseId?: s
   return league.purchases.some((purchase) => purchase.id !== excludePurchaseId && normalizedPlayerName(purchase.playerName) === normalized);
 }
 
-/** Single engine used by quick-entry, "última compra", and board edits. Validation order is fixed by spec. */
-export function applyPurchase(league: League, input: PurchaseInput, operationId: string): PurchaseResult {
+/** Single engine used by quick-entry, "última compra", board edits, and co-manager remote operations. Validation order is fixed by spec. */
+export function applyPurchase(league: League, input: PurchaseInput, operationId: string, updatedBy: string | null = null): PurchaseResult {
   const player = playerByName.get(normalizedPlayerName(input.playerName));
   if (!player) return { ok: false, error: "Selecciona un jugador de la lista." };
   if (isPlayerTaken(league, input.playerName)) return { ok: false, error: `${player.nombre} ya fue comprado.` };
@@ -56,11 +58,11 @@ export function applyPurchase(league: League, input: PurchaseInput, operationId:
   const now = Date.now();
   const purchase: Purchase = { id: makeId("purchase"), teamId: team.id, slotId: slot.id, playerName: player.nombre, position: player.posicion, price, createdAt: now, updatedAt: now };
   let next: League = { ...league, purchases: [...league.purchases, purchase] };
-  next = pushEvent(next, { type: "PLAYER_PURCHASED", createdAt: now, updatedAt: now, operationId, payload: { purchaseId: purchase.id, teamId: team.id, slotId: slot.id, playerName: purchase.playerName, price } });
+  next = pushEvent(next, { type: "PLAYER_PURCHASED", createdAt: now, updatedAt: now, operationId, payload: { purchaseId: purchase.id, teamId: team.id, slotId: slot.id, playerName: purchase.playerName, price } }, updatedBy);
   return { ok: true, league: next, purchase };
 }
 
-export function editPurchase(league: League, purchaseId: string, patch: { teamId?: string; playerName?: string; price?: number }, operationId: string): PurchaseResult {
+export function editPurchase(league: League, purchaseId: string, patch: { teamId?: string; playerName?: string; price?: number }, operationId: string, updatedBy: string | null = null): PurchaseResult {
   const existing = league.purchases.find((purchase) => purchase.id === purchaseId);
   if (!existing) return { ok: false, error: "La compra ya no existe." };
   const nextPlayerName = patch.playerName ?? existing.playerName;
@@ -84,11 +86,11 @@ export function editPurchase(league: League, purchaseId: string, patch: { teamId
   const now = Date.now();
   const updated: Purchase = { ...existing, teamId, slotId: slot.id, playerName: player.nombre, position: player.posicion, price, updatedAt: now };
   let next: League = { ...withoutExisting, purchases: [...withoutExisting.purchases, updated] };
-  next = pushEvent(next, { type: "PURCHASE_EDITED", createdAt: now, updatedAt: now, operationId, payload: { previous: existing, next: updated } });
+  next = pushEvent(next, { type: "PURCHASE_EDITED", createdAt: now, updatedAt: now, operationId, payload: { previous: existing, next: updated } }, updatedBy);
   return { ok: true, league: next, purchase: updated };
 }
 
-export function movePurchase(league: League, purchaseId: string, targetSlotId: string, operationId: string): PurchaseResult {
+export function movePurchase(league: League, purchaseId: string, targetSlotId: string, operationId: string, updatedBy: string | null = null): PurchaseResult {
   const existing = league.purchases.find((purchase) => purchase.id === purchaseId);
   if (!existing) return { ok: false, error: "La compra ya no existe." };
   if (targetSlotId === existing.slotId) return { ok: false, error: "El jugador ya está en ese slot." };
@@ -104,17 +106,17 @@ export function movePurchase(league: League, purchaseId: string, targetSlotId: s
   const now = Date.now();
   const updated: Purchase = { ...existing, slotId: targetSlotId, updatedAt: now };
   let next: League = { ...league, purchases: league.purchases.map((purchase) => (purchase.id === purchaseId ? updated : purchase)) };
-  next = pushEvent(next, { type: "PLAYER_MOVED", createdAt: now, updatedAt: now, operationId, payload: { purchaseId, fromSlotId: existing.slotId, toSlotId: targetSlotId } });
+  next = pushEvent(next, { type: "PLAYER_MOVED", createdAt: now, updatedAt: now, operationId, payload: { purchaseId, fromSlotId: existing.slotId, toSlotId: targetSlotId } }, updatedBy);
   return { ok: true, league: next, purchase: updated };
 }
 
-export function undoLastPurchase(league: League, operationId: string): PurchaseResult {
+export function undoLastPurchase(league: League, operationId: string, updatedBy: string | null = null): PurchaseResult {
   if (league.status !== "LIVE") return { ok: false, error: "El draft debe estar en curso (LIVE) para deshacer." };
   if (isOperationApplied(league, operationId)) return { ok: false, error: "Esta operación ya fue registrada." };
   const latest = [...league.purchases].sort((a, b) => b.createdAt - a.createdAt)[0];
   if (!latest) return { ok: false, error: "No hay compras para deshacer." };
   const now = Date.now();
   let next: League = { ...league, purchases: league.purchases.filter((purchase) => purchase.id !== latest.id) };
-  next = pushEvent(next, { type: "PURCHASE_UNDONE", createdAt: now, updatedAt: now, operationId, payload: { purchaseId: latest.id, purchase: latest } });
+  next = pushEvent(next, { type: "PURCHASE_UNDONE", createdAt: now, updatedAt: now, operationId, payload: { purchaseId: latest.id, purchase: latest } }, updatedBy);
   return { ok: true, league: next, purchase: latest };
 }

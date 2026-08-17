@@ -12,6 +12,8 @@ import { getOrInitAppData, saveAppData } from "../lib/storage";
 import { normalizedPlayerName, searchKey } from "../lib/text";
 import { shareOrDownloadTeamCard } from "../lib/teamCardPng";
 import type { League, Player, Position, Purchase, RosterCounts, Slot, Team } from "../lib/types";
+import ManagerSyncBridge from "./ManagerSyncBridge";
+import ManagersPanel from "./ManagersPanel";
 import PlayerCombobox from "./PlayerCombobox";
 import SpectatorPanel from "./SpectatorPanel";
 
@@ -80,7 +82,9 @@ export default function DraftBoard({ league, onChange }: { league: League; onCha
 
       <DraftStatusBar league={league} onStart={startNow} onFinalize={finalizeNow} onReopen={reopenNow} />
 
+      <ManagerSyncBridge league={league} onChange={onChange} onConflict={setToast} />
       <SpectatorPanel league={league} onChange={onChange} />
+      <ManagersPanel league={league} onChange={onChange} />
 
       {configOpen && (
         league.status === "PRE-DRAFT"

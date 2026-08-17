@@ -19,12 +19,15 @@ function isValidLeagueShape(value: unknown): value is League {
 function normalizeLeague(league: League): League {
   const needsScoring = typeof league.config.scoring !== "string";
   const needsSpectatorFields = typeof league.spectatorId === "undefined" || typeof league.spectatorPinEnabled === "undefined";
-  if (!needsScoring && !needsSpectatorFields) return league;
+  const needsManagerFields = typeof league.managers === "undefined" || typeof league.writeVersion === "undefined";
+  if (!needsScoring && !needsSpectatorFields && !needsManagerFields) return league;
   return {
     ...league,
     config: needsScoring ? { ...league.config, scoring: DEFAULT_SCORING } : league.config,
     spectatorId: typeof league.spectatorId === "undefined" ? null : league.spectatorId,
     spectatorPinEnabled: typeof league.spectatorPinEnabled === "undefined" ? false : league.spectatorPinEnabled,
+    managers: typeof league.managers === "undefined" ? [] : league.managers,
+    writeVersion: typeof league.writeVersion === "undefined" ? 1 : league.writeVersion,
   };
 }
 
@@ -150,6 +153,8 @@ function buildLeagueFromLegacy(legacy: LegacyData): League {
     eventLog,
     spectatorId: null,
     spectatorPinEnabled: false,
+    managers: [],
+    writeVersion: 1,
   };
 }
 

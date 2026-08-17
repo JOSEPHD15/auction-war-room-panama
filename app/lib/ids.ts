@@ -7,8 +7,12 @@ export function makeId(prefix: string): string {
   return `${prefix}_${Date.now()}_${counter}_${random}`;
 }
 
-/** Spectator/share links must be genuinely unguessable — always backed by the CSPRNG, never the weak Date.now() fallback. */
-export function makeSpectatorId(): string {
-  if (typeof crypto === "undefined" || typeof crypto.randomUUID !== "function") throw new Error("No secure random source available to generate a spectator link.");
+/** Any shareable access token (spectator or co-manager links) must be genuinely unguessable — always backed by the CSPRNG, never the weak Date.now() fallback. */
+export function makeAccessToken(): string {
+  if (typeof crypto === "undefined" || typeof crypto.randomUUID !== "function") throw new Error("No secure random source available to generate a share link.");
   return crypto.randomUUID().replace(/-/g, "");
+}
+
+export function makeSpectatorId(): string {
+  return makeAccessToken();
 }

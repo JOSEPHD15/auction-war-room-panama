@@ -46,6 +46,9 @@ export type LeagueEvent = {
   payload: unknown;
 };
 
+export type ManagerRole = "co-manager";
+export type ManagerAccess = { id: string; role: ManagerRole; label: string; createdAt: number };
+
 export type League = {
   id: string;
   schemaVersion: number;
@@ -62,6 +65,15 @@ export type League = {
   spectatorId: string | null;
   /** UI-only flag; the actual PIN hash lives server-side in D1, never in localStorage. */
   spectatorPinEnabled: boolean;
+  /** Co-manager access links. Empty = single-admin, fully local/offline (unchanged from Fase 1-5). */
+  managers: ManagerAccess[];
+  /**
+   * Optimistic-concurrency counter, bumped only by the purchase engine (applyPurchase/editPurchase/
+   * undoLastPurchase/movePurchase/resetPurchases) and mirrored by the server when a co-manager acts
+   * remotely. Deliberately separate from `updatedAt`/the event log's own `version` — this one exists
+   * solely so two managers can never both "win" a write to the same league state.
+   */
+  writeVersion: number;
 };
 
 export type AppData = {
