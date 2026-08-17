@@ -50,7 +50,12 @@ export default function DraftBoard({ league, onChange }: { league: League; onCha
   };
 
   const registerPurchase = (playerName: string, teamId: string, price: number, slotId?: string) => {
-    const ok = apply(applyPurchase(league, { teamId, playerName, price, slotId }, makeId("op")), `${playerName} registrado.`);
+    // Let commissioners prepare the first purchase directly on the board. The draft only changes
+    // from PRE-DRAFT to LIVE once that purchase is valid, so an incomplete entry never locks config.
+    const base = league.status === "PRE-DRAFT" ? startDraft(league) : { ok: true as const, league };
+    if (!base.ok) { setToast(base.error); return false; }
+    const message = league.status === "PRE-DRAFT" ? `${playerName} registrado. El draft está en vivo.` : `${playerName} registrado.`;
+    const ok = apply(applyPurchase(base.league, { teamId, playerName, price, slotId }, makeId("op")), message);
     if (ok && soundEnabled) playSaleSound();
     return ok;
   };
@@ -109,7 +114,7 @@ export default function DraftBoard({ league, onChange }: { league: League; onCha
 }
 
 function DraftStatusBar({ league, onStart, onFinalize, onReopen }: { league: League; onStart: () => void; onFinalize: () => void; onReopen: () => void }) {
-  if (league.status === "PRE-DRAFT") return <div className="draft-status-bar"><span className="status-pill status-pre">PRE-DRAFT</span><p>Configura equipos, presupuesto y roster, luego inicia el draft para habilitar las compras.</p><button className="save-button" onClick={onStart}>▶ Iniciar Draft</button></div>;
+  if (league.status === "PRE-DRAFT") return <div className="draft-status-bar"><span className="status-pill status-pre">PRE-DRAFT</span><p>Ya puedes escribir en el tablero. Al registrar la primera compra, el draft comenzará automáticamente.</p><button className="save-button" onClick={onStart}>▶ Iniciar ahora</button></div>;
   if (league.status === "LIVE") return <div className="draft-status-bar"><span className="status-pill status-live">LIVE</span><p>El draft está en curso.</p><button className="danger-button" onClick={onFinalize}>Finalizar Draft</button></div>;
   return <div className="draft-status-bar"><span className="status-pill status-done">FINALIZADO</span><p>Draft finalizado: el tablero queda de solo lectura, pero puedes exportarlo.</p><button className="ghost-button" onClick={onReopen}>Reabrir Draft</button></div>;
 }
@@ -174,10 +179,10 @@ function LastPurchase({ league, lastPurchase, onRegister, onUndo, canUndo }: { l
         <strong>{lastPurchase ? money(lastPurchase.price) : "$—"}</strong>
       </div>
       <div className="quick-purchase">
-        <label htmlFor="quick-player-list">JUGADOR<PlayerCombobox value={player} onChange={setPlayer} league={league} players={PLAYERS} id="quick-player-list" disabled={league.status !== "LIVE"} /></label>
-        <label>EQUIPO<select value={teamId} onChange={(event) => setTeamId(event.target.value)}>{league.teams.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-        <label htmlFor="quick-price">PRECIO<div className="quick-price"><span>$</span><input id="quick-price" type="number" min={league.config.minimumBid} value={price} onChange={(event) => setPrice(event.target.value)} placeholder="0" onKeyDown={(event) => { if (event.key === "Enter" && player && team && price !== "") submit(); }} /></div></label>
-        <button className="register-button" onClick={submit} disabled={league.status !== "LIVE"}>VENDIDO</button>
+        <label htmlFor="quick-player-list">JUGADOR<PlayerCombobox value={player} onChange={setPlayer} league={league} players={PLAYERS} id="quick-player-list" disabled={league.status === "FINALIZADO"} /></label>
+        <label>EQUIPO<select value={teamId} disabled={league.status === "FINALIZADO"} onChange={(event) => setTeamId(event.target.value)}>{league.teams.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+        <label htmlFor="quick-price">PRECIO<div className="quick-price"><span>$</span><input id="quick-price" type="number" min={league.config.minimumBid} value={price} disabled={league.status === "FINALIZADO"} onChange={(event) => setPrice(event.target.value)} placeholder="0" onKeyDown={(event) => { if (event.key === "Enter" && player && team && price !== "") submit(); }} /></div></label>
+        <button className="register-button" onClick={submit} disabled={league.status === "FINALIZADO"}>VENDIDO</button>
         <button className="undo-button" disabled={!canUndo} onClick={onUndo}>↶ Deshacer</button>
       </div>
     </article>
@@ -212,10 +217,10 @@ function BoardCell({ league, team, slot, purchase, onRegister, onEdit, onMove }:
 
   return (
     <div className="pick-cell">
-      <PlayerCombobox value={jugador} onChange={(value) => { setJugador(value); commit(value, precio); }} league={league} players={positionPlayers} id={`board-${team.id}-${slot.id}`} disabled={league.status !== "LIVE"} />
+      <PlayerCombobox value={jugador} onChange={(value) => { setJugador(value); commit(value, precio); }} league={league} players={positionPlayers} id={`board-${team.id}-${slot.id}`} disabled={league.status === "FINALIZADO"} />
       <div className="price-row">
         <span>$</span>
-        <input aria-label={`Precio de ${team.name}, ${slot.label}`} className="price-field" type="number" min="0" value={precio} onChange={(event) => { setPrecio(event.target.value); commit(jugador, event.target.value); }} placeholder="0" disabled={league.status !== "LIVE"} />
+        <input aria-label={`Precio de ${team.name}, ${slot.label}`} className="price-field" type="number" min={league.config.minimumBid} value={precio} onChange={(event) => { setPrecio(event.target.value); commit(jugador, event.target.value); }} placeholder="0" disabled={league.status === "FINALIZADO"} />
         {purchase && <em>{purchase.position}</em>}
       </div>
       {purchase && otherCompatibleEmptySlots.length > 0 && (

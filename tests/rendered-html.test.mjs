@@ -42,3 +42,10 @@ test("exports a true multi-sheet Excel workbook", async () => {
   assert.match(source, /XLSX\.writeFile/);
   assert.match(source, /\^\[=\+\\-@\]/);
 });
+
+test("allows preparing the first purchase before manually starting the draft", async () => {
+  const board = await readFile(new URL("../app/components/DraftBoard.tsx", import.meta.url), "utf8");
+  assert.match(board, /league\.status === "PRE-DRAFT" \? startDraft\(league\)/);
+  assert.match(board, /disabled=\{league\.status === "FINALIZADO"\}/);
+  assert.match(board, /primera compra, el draft comenzará automáticamente/);
+});
