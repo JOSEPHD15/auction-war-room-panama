@@ -1,116 +1,157 @@
-﻿"use client";
+"use client";
 
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
-import playerCatalog from "./players.json";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import DraftBoard from "./components/DraftBoard";
+import LeagueSelector, { CreateLeagueInput } from "./components/LeagueSelector";
+import { downloadJSON } from "./lib/download";
+import { createLeague, duplicateLeague, exportAllLeaguesPayload, exportLeaguePayload, parseImportFile, withFreshId } from "./lib/leagues";
+import { APP_VERSION, deleteLeague, ensureMigrated, getOrInitAppData, listLeagueSummaries, loadLeague, saveAppData, saveLeague, SCHEMA_VERSION } from "./lib/storage";
+import type { AppData, League, LeagueSummary } from "./lib/types";
 
-type Position = "QB" | "RB" | "WR" | "TE" | "K" | "DEF";
-type Player = { nombre: string; posicion: Position; equipoNFL: string };
-type Pick = { jugador: string; posicion: string; precio: string; objetivo: string };
-type LastPick = { team: string; slot: string; jugador: string; precio: string; posicion: string; updatedAt: number };
-type Purchase = LastPick & { id: number; slotIndex: number; previousPick: Pick };
-
-const DEFAULT_TEAMS = ["Dirupeps", "HITORI KAKURENBO", "Chocolate Coco", "Bali Maxx", "HyP", "Sum2Prove", "SHAKED", "Deluxe", "la lavanderia", "Los culecos"];
-const SLOTS = ["QB", "RB1", "RB2", "WR1", "WR2", "TE", "FLEX", "K", "DEF", "Banca 1", "Banca 2", "Banca 3", "Banca 4", "Banca 5"];
-const POSITIONS: Position[] = ["QB", "RB", "WR", "TE", "K", "DEF"];
-const BUDGET = 200;
-const STORAGE_KEY = "auction-war-room-v1";
-
-// Catálogo oficial importado desde la lista proporcionada por la liga.
-const PLAYERS = playerCatalog as Player[];
-
-const emptyPick = (): Pick => ({ jugador: "", posicion: "", precio: "", objetivo: "" });
-const makeBoard = (teams = DEFAULT_TEAMS) => Object.fromEntries(teams.map((team) => [team, SLOTS.map(emptyPick)])) as Record<string, Pick[]>;
-function allowedPositions(slot: string): Position[] { if (slot.startsWith("RB")) return ["RB"]; if (slot.startsWith("WR")) return ["WR"]; if (["QB","TE","K","DEF"].includes(slot)) return [slot as Position]; if (slot === "FLEX") return ["RB","WR","TE"]; return POSITIONS; }
-function money(value: number) { return `$${Math.max(0, Math.round(value))}`; }
-function statsFor(picks: Pick[]) { const spent = picks.reduce((sum, pick) => sum + (Number(pick.precio) || 0), 0); const filled = picks.filter((pick) => pick.jugador.trim()).length; const empty = SLOTS.length - filled; const remaining = BUDGET - spent; const maxBid = empty > 0 ? remaining - (empty - 1) : remaining; return { spent, filled, empty, remaining, maxBid, average: empty ? remaining / empty : remaining }; }
-function normalizedPlayerName(value: string) { return value.trim().toLocaleLowerCase("es"); }
-function findDuplicatePlayer(nextBoard: Record<string, Pick[]>) { const seen = new Map<string, string>(); for (const picks of Object.values(nextBoard)) { for (const pick of picks) { const normalized = normalizedPlayerName(pick.jugador); if (!normalized) continue; if (seen.has(normalized)) return seen.get(normalized) || pick.jugador; seen.set(normalized, pick.jugador.trim()); } } return null; }
-
-function PlayerInput({ value, onChange, options, id }: { value: string; onChange: (value: string) => void; options: Player[]; id: string }) {
-  return <><input aria-label="Jugador" className="field player-field" list={id} value={value} onChange={(event) => onChange(event.target.value)} placeholder="Jugador" /><datalist id={id}>{options.map((player) => <option key={`${player.nombre}-${player.posicion}`} value={player.nombre}>{player.posicion}</option>)}</datalist></>;
-}
+const INITIAL_APP_DATA: AppData = { schemaVersion: SCHEMA_VERSION, appVersion: APP_VERSION, lastOpenedLeagueId: null, dark: true };
 
 export default function Home() {
-  const [dark, setDark] = useState(true);
-  const [teams, setTeams] = useState<string[]>(DEFAULT_TEAMS);
-  const [board, setBoard] = useState<Record<string, Pick[]>>(makeBoard);
-  const [lastPick, setLastPick] = useState<LastPick | null>(null);
-  const [purchaseHistory, setPurchaseHistory] = useState<Purchase[]>([]);
-  const [configOpen, setConfigOpen] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
+  const [appData, setAppData] = useState<AppData>(INITIAL_APP_DATA);
+  const [league, setLeague] = useState<League | null>(null);
+  const [summaries, setSummaries] = useState<LeagueSummary[]>([]);
   const [toast, setToast] = useState("");
   const importRef = useRef<HTMLInputElement>(null);
-  const playerMap = useMemo(() => new Map(PLAYERS.map((player) => [player.nombre.toLowerCase(), player])), []);
 
-  useEffect(() => { try { const saved = localStorage.getItem(STORAGE_KEY); if (saved) { const data = JSON.parse(saved); if (Array.isArray(data.teams) && data.teams.length) setTeams(data.teams); if (data.board) setBoard(data.board); if (data.lastPick) setLastPick(data.lastPick); if (Array.isArray(data.purchaseHistory)) setPurchaseHistory(data.purchaseHistory); if (typeof data.dark === "boolean") setDark(data.dark); } } catch { setToast("No se pudo restaurar el guardado anterior."); } setHydrated(true); }, []);
-  useEffect(() => { if (hydrated) localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 4, teams, board, lastPick, purchaseHistory, dark })); }, [teams, board, lastPick, purchaseHistory, dark, hydrated]);
-  useEffect(() => { if (!toast) return; const timer = setTimeout(() => setToast(""), 2600); return () => clearTimeout(timer); }, [toast]);
+  const refreshSummaries = () => setSummaries(listLeagueSummaries());
 
-  const updatePick = (team: string, slotIndex: number, patch: Partial<Pick>) => setBoard((current) => {
-    if (patch.jugador !== undefined) {
-      const requested = normalizedPlayerName(patch.jugador);
-      const duplicate = Object.entries(current).some(([otherTeam, picks]) => picks.some((pick, otherIndex) => (otherTeam !== team || otherIndex !== slotIndex) && normalizedPlayerName(pick.jugador) === requested && requested !== ""));
-      if (duplicate) { setToast(`${patch.jugador.trim()} ya fue comprado y no se puede repetir.`); return current; }
+  useEffect(() => {
+    ensureMigrated();
+    const data = getOrInitAppData();
+    setAppData(data);
+    refreshSummaries();
+    if (data.lastOpenedLeagueId) {
+      const found = loadLeague(data.lastOpenedLeagueId);
+      if (found) setLeague(found);
+      else saveAppData({ ...data, lastOpenedLeagueId: null });
     }
-    return { ...current, [team]: (current[team] || SLOTS.map(emptyPick)).map((pick, index) => { if (index !== slotIndex) return pick; const next = { ...pick, ...patch }; const matchedPlayer = playerMap.get(normalizedPlayerName(next.jugador)); if (patch.jugador !== undefined) next.posicion = matchedPlayer?.posicion || (patch.jugador.trim() ? next.posicion : ""); if (matchedPlayer && !allowedPositions(SLOTS[slotIndex]).includes(matchedPlayer.posicion)) { setToast(`${matchedPlayer.nombre} no puede ocupar el slot ${SLOTS[slotIndex]}.`); return pick; } if (next.jugador.trim() && next.precio !== "") { const teamPicks = current[team] || SLOTS.map(emptyPick); const otherSpent = teamPicks.reduce((sum, item, itemIndex) => sum + (itemIndex === slotIndex ? 0 : Number(item.precio) || 0), 0); const remainingSlots = teamPicks.filter((item, itemIndex) => itemIndex !== slotIndex && !item.jugador.trim()).length; const maxPrice = BUDGET - otherSpent - remainingSlots; if (Number(next.precio) > maxPrice) { setToast(`Precio inválido: ${team} solo puede pagar hasta ${money(maxPrice)}.`); return pick; } } if (next.jugador.trim() && next.precio !== "" && !(pick.jugador.trim() && pick.precio !== "")) { const entry = { team, slot: SLOTS[slotIndex], jugador: next.jugador.trim(), precio: next.precio, posicion: next.posicion, updatedAt: Date.now(), id: Date.now(), slotIndex, previousPick: emptyPick() }; setLastPick(entry); setPurchaseHistory((history) => [entry, ...history].slice(0, 100)); } return next; }) };
-  });
-  const registerPurchase = (jugador: string, team: string, precio: string) => {
-    const player = playerMap.get(normalizedPlayerName(jugador));
-    if (!player) { setToast("Selecciona un jugador de la lista."); return false; }
-    if (!team || !teams.includes(team)) { setToast("Selecciona el equipo comprador."); return false; }
-    if (!precio || Number(precio) < 1) { setToast("Ingresa un precio válido."); return false; }
-    if (Object.values(board).flat().some((pick) => normalizedPlayerName(pick.jugador) === normalizedPlayerName(jugador))) { setToast(`${jugador} ya fue comprado.`); return false; }
-    const picks = board[team] || SLOTS.map(emptyPick); const stats = statsFor(picks);
-    if (stats.filled >= SLOTS.length) { setToast(`${team} ya tiene el roster completo.`); return false; }
-    if (Number(precio) > stats.maxBid) { setToast(`Puja inválida: ${team} solo puede pagar hasta ${money(stats.maxBid)}.`); return false; }
-    const preferred = SLOTS.findIndex((slot, index) => !picks[index]?.jugador.trim() && allowedPositions(slot).length === 1 && allowedPositions(slot)[0] === player.posicion);
-    const flex = ["RB","WR","TE"].includes(player.posicion) ? SLOTS.findIndex((slot, index) => slot === "FLEX" && !picks[index]?.jugador.trim()) : -1;
-    const bench = SLOTS.findIndex((slot, index) => slot.startsWith("Banca") && !picks[index]?.jugador.trim());
-    const slotIndex = preferred >= 0 ? preferred : flex >= 0 ? flex : bench;
-    if (slotIndex < 0) { setToast(`${team} no tiene un slot compatible disponible.`); return false; }
-    const pick = { jugador: player.nombre, posicion: player.posicion, precio, objetivo: "" }; const entry = { team, slot: SLOTS[slotIndex], jugador: player.nombre, precio, posicion: player.posicion, updatedAt: Date.now(), id: Date.now(), slotIndex, previousPick: picks[slotIndex] };
-    setBoard((current) => ({ ...current, [team]: (current[team] || SLOTS.map(emptyPick)).map((item, index) => index === slotIndex ? pick : item) })); setLastPick(entry); setPurchaseHistory((history) => [entry, ...history].slice(0, 100)); setToast(`${player.nombre} registrado para ${team}.`); return true;
+  }, []);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(""), 2600);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  const openLeague = (id: string) => {
+    const found = loadLeague(id);
+    if (!found) { setToast("No se pudo abrir la liga."); refreshSummaries(); return; }
+    setLeague(found);
+    const nextApp = { ...appData, lastOpenedLeagueId: id };
+    saveAppData(nextApp);
+    setAppData(nextApp);
   };
-  const undoLastPurchase = () => { const latest = purchaseHistory[0]; if (!latest) { setToast("No hay compras para deshacer."); return; } setBoard((current) => ({ ...current, [latest.team]: (current[latest.team] || SLOTS.map(emptyPick)).map((pick, index) => index === latest.slotIndex ? latest.previousPick : pick) })); const remaining = purchaseHistory.slice(1); setPurchaseHistory(remaining); setLastPick(remaining[0] || null); setToast(`Se deshizo la compra de ${latest.jugador}.`); };
-  const applyTeams = (nextTeams: string[]) => { const cleaned = nextTeams.map((team, index) => team.trim() || `Equipo ${index + 1}`); if (new Set(cleaned.map((team) => team.toLowerCase())).size !== cleaned.length) { setToast("Cada equipo debe tener un nombre diferente."); return; } setBoard((current) => Object.fromEntries(cleaned.map((team, index) => [team, current[teams[index]] || SLOTS.map(emptyPick)])) as Record<string, Pick[]>); setLastPick((current) => current ? { ...current, team: cleaned[teams.indexOf(current.team)] || current.team } : current); setTeams(cleaned); setConfigOpen(false); setToast("Equipos actualizados."); };
-  const exportJSON = () => { const blob = new Blob([JSON.stringify({ version: 4, teams, board, lastPick, purchaseHistory, dark }, null, 2)], { type: "application/json" }); const url = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = url; anchor.download = "auction-board.json"; anchor.click(); URL.revokeObjectURL(url); setToast("Board exportado."); };
-  const importJSON = async (event: ChangeEvent<HTMLInputElement>) => { const file = event.target.files?.[0]; if (!file) return; try { const data = JSON.parse(await file.text()); if (!data.board) throw new Error(); const duplicate = findDuplicatePlayer(data.board); if (duplicate) { setToast(`No se importó: ${duplicate} aparece más de una vez.`); event.target.value = ""; return; } setBoard(data.board); if (Array.isArray(data.teams)) setTeams(data.teams); setLastPick(data.lastPick || null); setPurchaseHistory(Array.isArray(data.purchaseHistory) ? data.purchaseHistory : []); setToast("Board importado."); } catch { setToast("El archivo no es válido."); } event.target.value = ""; };
-  const resetBoard = () => { if (confirm("¿Vaciar todo el Draft Board?")) { setBoard(makeBoard(teams)); setLastPick(null); setPurchaseHistory([]); setToast("Draft Board reiniciado."); } };
 
-  return <main className={dark ? "app theme-dark" : "app theme-light"}>
-    <header className="topbar public-topbar">
-      <button className="brand" aria-label="Auction War Room"><span className="brand-mark brand-mark-image"><img src="/draftlab-logo.jpeg" alt="Draft Lab" /></span><span><b>AUCTION</b><small>WAR ROOM · 0.5 PPR</small></span></button>
-      <div className="public-title">DRAFT BOARD <span>EN VIVO</span></div>
-      <div className="header-actions"><button className="icon-button" onClick={() => setDark((value) => !value)} aria-label="Cambiar tema">{dark ? "☀" : "◐"}</button><button className="ghost-button" onClick={exportJSON}>Exportar</button><button className="ghost-button" onClick={() => importRef.current?.click()}>Importar</button><input ref={importRef} className="sr-only" type="file" accept="application/json" onChange={importJSON} /></div>
-    </header>
-    <section className="page-shell">
-      <div className="page-intro"><div><span className="eyebrow">Sala de subasta</span><h1>Draft Board</h1><p>Compras, presupuestos y poder de puja de toda la liga en tiempo real.</p></div><div className="intro-actions"><button className="ghost-button" onClick={() => setConfigOpen(!configOpen)}>⚙ Editar liga</button><button className="danger-button" onClick={resetBoard}>Vaciar board</button></div></div>
-      {configOpen && <LeagueSettings teams={teams} onSave={applyTeams} onCancel={() => setConfigOpen(false)} />}
-      <BaliSponsor />
-      <LastPurchase lastPick={lastPick} teams={teams} board={board} onRegister={registerPurchase} onUndo={undoLastPurchase} canUndo={purchaseHistory.length > 0} />
-      <div className="legend"><span><i className="dot dot-green" /> Poder de compra &gt; $40</span><span><i className="dot dot-red" /> Topado &lt; $6</span><span><i className="dot dot-gold" /> {PLAYERS.length} jugadores · duplicados bloqueados</span></div>
-      <DraftTable teams={teams} board={board} updatePick={updatePick} />
-      <AvailablePlayers board={board} />
-      <PurchaseHistory history={purchaseHistory} />
-      <TeamControl teams={teams} board={board} />
-      <NeedsTable teams={teams} board={board} />
-    </section>
-    <footer><span>Guardado automático en este dispositivo</span><span>{teams.length} equipos · $200 · 14 slots</span><span className="footer-sponsor">Sponsored by Bali Maxx</span></footer>
-    {toast && <div className="toast" role="status">{toast}</div>}
-  </main>;
+  const backToLeagues = () => {
+    setLeague(null);
+    const nextApp = { ...appData, lastOpenedLeagueId: null };
+    saveAppData(nextApp);
+    setAppData(nextApp);
+    refreshSummaries();
+  };
+
+  const handleLeagueChange = (updated: League) => {
+    const saved = saveLeague(updated);
+    setLeague(saved);
+    refreshSummaries();
+  };
+
+  const handleCreate = (input: CreateLeagueInput) => {
+    const created = saveLeague(createLeague(input));
+    const nextApp = { ...appData, lastOpenedLeagueId: created.id };
+    saveAppData(nextApp);
+    setAppData(nextApp);
+    setLeague(created);
+    refreshSummaries();
+    setToast(`Liga "${created.name}" creada.`);
+  };
+
+  const handleDuplicate = (id: string) => {
+    const source = loadLeague(id);
+    if (!source) { setToast("No se pudo duplicar la liga."); return; }
+    saveLeague(duplicateLeague(source));
+    refreshSummaries();
+    setToast("Liga duplicada.");
+  };
+
+  const handleDelete = (id: string) => {
+    deleteLeague(id);
+    if (league?.id === id) { setLeague(null); setAppData((current) => current ? { ...current, lastOpenedLeagueId: null } : current); }
+    refreshSummaries();
+    setToast("Liga eliminada.");
+  };
+
+  const toggleDark = () => {
+    const nextApp = { ...appData, dark: !appData.dark };
+    saveAppData(nextApp);
+    setAppData(nextApp);
+  };
+
+  const exportCurrentLeague = () => {
+    if (!league) return;
+    downloadJSON(exportLeaguePayload(league), `liga-${league.name.replace(/\s+/g, "-").toLowerCase()}.json`);
+    setToast("Liga exportada.");
+  };
+
+  const exportAllLeagues = () => {
+    const all = summaries.map((summary) => loadLeague(summary.id)).filter((item): item is League => !!item);
+    downloadJSON(exportAllLeaguesPayload(all), `auction-war-room-backup-${new Date().toISOString().slice(0, 10)}.json`);
+    setToast("Todas las ligas exportadas.");
+  };
+
+  const importLeaguesFile = async (file: File) => {
+    const text = await file.text();
+    const parsed = parseImportFile(text);
+    if (!parsed.ok) { setToast(`No se importó: ${parsed.error}`); return; }
+    let imported = 0;
+    for (let candidate of parsed.leagues) {
+      const existing = loadLeague(candidate.id);
+      if (existing) {
+        const replace = confirm(`Ya existe una liga guardada con el mismo ID que "${candidate.name}". ¿Reemplazarla? (Cancelar para importarla como copia nueva)`);
+        if (!replace) candidate = withFreshId(candidate);
+      }
+      saveLeague(candidate);
+      imported += 1;
+    }
+    refreshSummaries();
+    setToast(`${imported} liga(s) importada(s).`);
+  };
+
+  const importSingleLeagueFile = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (file) importLeaguesFile(file);
+  };
+
+  return (
+    <main className={appData.dark ? "app theme-dark" : "app theme-light"}>
+      <header className="topbar public-topbar">
+        <button className="brand" aria-label="Auction War Room" onClick={league ? backToLeagues : undefined}>
+          <span className="brand-mark brand-mark-image"><img src="/draftlab-logo.jpeg" alt="Draft Lab" /></span>
+          <span><b>AUCTION</b><small>WAR ROOM · MULTI-LIGA</small></span>
+        </button>
+        <div className="public-title">{league ? <>{league.name.toUpperCase()} <span>{league.status}</span></> : "TUS LIGAS"}</div>
+        <div className="header-actions">
+          <button className="icon-button" onClick={toggleDark} aria-label="Cambiar tema">{appData.dark ? "☀" : "◐"}</button>
+          {league && <>
+            <button className="ghost-button" onClick={backToLeagues}>← Ligas</button>
+            <button className="ghost-button" onClick={exportCurrentLeague}>Exportar</button>
+            <button className="ghost-button" onClick={() => importRef.current?.click()}>Importar</button>
+            <input ref={importRef} className="sr-only" type="file" accept="application/json" onChange={importSingleLeagueFile} />
+          </>}
+        </div>
+      </header>
+      {league ? (
+        <DraftBoard league={league} onChange={handleLeagueChange} />
+      ) : (
+        <LeagueSelector leagues={summaries} onCreate={handleCreate} onOpen={openLeague} onDuplicate={handleDuplicate} onDelete={handleDelete} onExportAll={exportAllLeagues} onImportFile={importLeaguesFile} />
+      )}
+      <footer><span>Guardado automático en este dispositivo</span>{league && <span>{league.teams.length} equipos · ${league.config.budget} · {league.config.slots.length} slots</span>}</footer>
+      {toast && <div className="toast" role="status">{toast}</div>}
+    </main>
+  );
 }
-
-function BaliSponsor() { return <aside className="bali-sponsor-banner"><img src="/bali-maxx.png" alt="Bali Maxx Fantasy Football" /><div><span>SPONSORED BY</span><strong>BALI MAXX</strong><small>MINT CONDITION CHAMPIONS</small></div></aside>; }
-function LastPurchase({ lastPick, teams, board, onRegister, onUndo, canUndo }: { lastPick: LastPick | null; teams: string[]; board: Record<string, Pick[]>; onRegister: (player: string, team: string, price: string) => boolean; onUndo: () => void; canUndo: boolean }) { const [player, setPlayer] = useState(""); const [team, setTeam] = useState(teams[0] || ""); const [price, setPrice] = useState(""); const drafted = new Set(Object.values(board).flat().map((pick) => normalizedPlayerName(pick.jugador)).filter(Boolean)); const available = PLAYERS.filter((item) => !drafted.has(normalizedPlayerName(item.nombre))); const submit = () => { if (onRegister(player, team, price)) { setPlayer(""); setPrice(""); } }; return <article className={`last-pick-hero ${lastPick ? "has-pick" : ""}`}><div className="last-pick-label"><i /> ÚLTIMA COMPRA</div><div className="last-pick-main"><div><span>{lastPick?.posicion || "EN ESPERA"}</span><h2>{lastPick?.jugador || "Esperando la primera compra"}</h2><p>{lastPick ? `${lastPick.team} · ${lastPick.slot}` : "También puedes registrar la compra directamente aquí."}</p></div><strong>{lastPick ? money(Number(lastPick.precio)) : "$—"}</strong></div><div className="quick-purchase"><label>JUGADOR<PlayerInput value={player} onChange={setPlayer} options={available} id="quick-player-list" /></label><label>EQUIPO<select value={team} onChange={(event) => setTeam(event.target.value)}>{teams.map((name) => <option key={name}>{name}</option>)}</select></label><label>PRECIO<div className="quick-price"><span>$</span><input type="number" min="1" max="200" value={price} onChange={(event) => setPrice(event.target.value)} placeholder="0" onKeyDown={(event) => { if (event.key === "Enter") submit(); }} /></div></label><button className="register-button" onClick={submit}>Registrar compra</button><button className="undo-button" disabled={!canUndo} onClick={onUndo}>↶ Deshacer</button></div></article>; }
-
-function AvailablePlayers({ board }: { board: Record<string, Pick[]> }) { const [search, setSearch] = useState(""); const [position, setPosition] = useState<"TODOS" | Position>("TODOS"); const drafted = new Set(Object.values(board).flat().map((pick) => normalizedPlayerName(pick.jugador)).filter(Boolean)); const rankedPlayers = PLAYERS.map((player) => ({ ...player, rank: PLAYERS.filter((item) => item.posicion === player.posicion).findIndex((item) => item.nombre === player.nombre) + 1 })); const results = rankedPlayers.filter((player) => !drafted.has(normalizedPlayerName(player.nombre)) && (position === "TODOS" || player.posicion === position) && player.nombre.toLocaleLowerCase("es").includes(search.toLocaleLowerCase("es"))); const visiblePositions = position === "TODOS" ? POSITIONS : [position]; return <section><div className="section-heading compact-heading"><div><span className="eyebrow">Agentes libres</span><h2>Disponibles por ranking y posición</h2></div><p>{PLAYERS.length - drafted.size} jugadores disponibles</p></div><div className="available-panel"><div className="available-search"><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar jugador…" aria-label="Buscar jugadores disponibles" /><select value={position} onChange={(event) => setPosition(event.target.value as "TODOS" | Position)}><option value="TODOS">Todas las posiciones</option>{POSITIONS.map((item) => <option key={item}>{item}</option>)}</select></div><div className={`rank-columns ${position !== "TODOS" ? "single-position" : ""}`}>{visiblePositions.map((pos) => { const players = results.filter((player) => player.posicion === pos); return <div className="rank-column" key={pos}><div className="rank-column-head"><strong>{pos}</strong><span>{players.length} disponibles</span></div><div className="rank-column-list">{players.length ? players.map((player) => <div className="ranked-player" key={`${player.nombre}-${player.posicion}`}><em>#{player.rank}</em><b>{player.nombre}</b></div>) : <p>No hay jugadores disponibles.</p>}</div></div>; })}</div></div></section>; }
-
-function PurchaseHistory({ history }: { history: Purchase[] }) { return <section><div className="section-heading compact-heading"><div><span className="eyebrow">Registro de la noche</span><h2>Historial de compras</h2></div><p>Las últimas 100 compras quedan guardadas.</p></div><div className="history-panel">{history.length ? history.map((purchase, index) => <div className="history-row" key={purchase.id}><span className="history-number">#{history.length - index}</span><div><b>{purchase.jugador}</b><small>{purchase.posicion} · {purchase.slot}</small></div><span>{purchase.team}</span><strong>{money(Number(purchase.precio))}</strong></div>) : <div className="history-empty">Todavía no se han registrado compras.</div>}</div></section>; }
-
-function DraftTable({ teams, board, updatePick }: { teams: string[]; board: Record<string, Pick[]>; updatePick: (team: string, index: number, patch: Partial<Pick>) => void }) { const drafted = new Set(Object.values(board).flat().map((pick) => normalizedPlayerName(pick.jugador)).filter(Boolean)); return <div className="table-wrap board-wrap"><table className="draft-table"><thead><tr><th className="sticky-col">SLOT</th>{teams.map((team) => { const stats = statsFor(board[team] || SLOTS.map(emptyPick)); return <th key={team}><span>{team}</span><small>{money(stats.remaining)} libres</small></th>; })}</tr></thead><tbody>{SLOTS.map((slot, slotIndex) => <tr key={slot}><th className="sticky-col"><span className="slot-badge">{slot}</span></th>{teams.map((team, teamIndex) => { const pick = (board[team] || SLOTS.map(emptyPick))[slotIndex]; const currentName = normalizedPlayerName(pick.jugador); const options = PLAYERS.filter((player) => allowedPositions(slot).includes(player.posicion) && (!drafted.has(normalizedPlayerName(player.nombre)) || normalizedPlayerName(player.nombre) === currentName)); return <td key={team}><div className="pick-cell"><PlayerInput value={pick.jugador} onChange={(jugador) => updatePick(team, slotIndex, { jugador })} options={options} id={`board-${slotIndex}-${teamIndex}`} /><div className="price-row"><span>$</span><input aria-label={`Precio de ${team}, ${slot}`} className="price-field" type="number" min="0" max="200" value={pick.precio} onChange={(event) => updatePick(team, slotIndex, { precio: event.target.value })} placeholder="0" />{pick.posicion && <em>{pick.posicion}</em>}</div></div></td>; })}</tr>)}</tbody></table></div>; }
-function TeamControl({ teams, board }: { teams: string[]; board: Record<string, Pick[]> }) { return <><div className="section-heading"><div><span className="eyebrow">Control financiero</span><h2>Poder de compra por equipo</h2></div><p>Máxima puja reserva $1 por cada slot pendiente.</p></div><div className="team-grid">{teams.map((team) => { const stats = statsFor(board[team] || SLOTS.map(emptyPick)); const tone = stats.maxBid > 40 ? "green" : stats.maxBid < 6 ? "red" : "blue"; return <article className="team-card" key={team}><div className="team-card-head"><h3>{team}</h3><span>{stats.filled}/{SLOTS.length}</span></div><div className="money-pair"><Metric label="RESTANTE" value={money(stats.remaining)} /><Metric label="MÁXIMA PUJA" value={money(stats.maxBid)} tone={tone} /></div><div className="stat-line"><span>Gastado <b>{money(stats.spent)}</b></span><span>Vacíos <b>{stats.empty}</b></span><span>Promedio <b>${stats.average.toFixed(1)}</b></span></div></article>; })}</div></>; }
-function Metric({ label, value, tone }: { label: string; value: string; tone?: string }) { return <div className={`metric metric-strong ${tone ? `metric-${tone}` : ""}`}><span>{label}</span><b>{value}</b></div>; }
-function NeedsTable({ teams, board }: { teams: string[]; board: Record<string, Pick[]> }) { const targets: Record<Position, number> = { QB: 1, RB: 2, WR: 2, TE: 1, K: 1, DEF: 1 }; const map = new Map(PLAYERS.map((player) => [player.nombre.toLowerCase(), player.posicion])); return <div><div className="section-heading"><div><span className="eyebrow">Radar competitivo</span><h2>Qué le falta a cada equipo</h2></div></div><div className="table-wrap"><table className="needs-table"><thead><tr><th>Equipo</th>{POSITIONS.map((position) => <th key={position}>{position}</th>)}</tr></thead><tbody>{teams.map((team) => { const counts = Object.fromEntries(POSITIONS.map((position) => [position, 0])) as Record<Position, number>; (board[team] || []).forEach((pick) => { const position = map.get(pick.jugador.toLowerCase()); if (position) counts[position]++; }); return <tr key={team}><th>{team}</th>{POSITIONS.map((position) => { const missing = Math.max(0, targets[position] - counts[position]); return <td key={position}>{missing === 0 ? <span className="complete">✓</span> : <span className="missing">{missing}</span>}</td>; })}</tr>; })}</tbody></table></div></div>; }
-function LeagueSettings({ teams, onSave, onCancel }: { teams: string[]; onSave: (teams: string[]) => void; onCancel: () => void }) { const [draft, setDraft] = useState(teams); const changeCount = (count: number) => setDraft((current) => Array.from({ length: Math.min(16, Math.max(2, count)) }, (_, index) => current[index] || `Equipo ${index + 1}`)); return <div className="league-settings"><div className="settings-head"><div><span className="eyebrow">Configuración de liga</span><h2>Equipos y nombres</h2></div><label>CANTIDAD<input aria-label="Cantidad de equipos" type="number" min="2" max="16" value={draft.length} onChange={(event) => changeCount(Number(event.target.value))} /></label></div><div className="team-name-grid">{draft.map((team, index) => <label key={index}><span>{index + 1}</span><input aria-label={`Nombre del equipo ${index + 1}`} value={team} onChange={(event) => setDraft((current) => current.map((name, itemIndex) => itemIndex === index ? event.target.value : name))} /></label>)}</div><div className="settings-actions"><button className="ghost-button" onClick={onCancel}>Cancelar</button><button className="save-button" onClick={() => onSave(draft)}>Guardar equipos</button></div></div>; }
-
-
